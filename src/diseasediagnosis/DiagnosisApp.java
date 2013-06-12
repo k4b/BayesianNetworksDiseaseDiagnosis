@@ -4,14 +4,29 @@
  */
 package diseasediagnosis;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author Karol Abramczyk
  */
-public class DiagnosisApp extends javax.swing.JFrame {
+public class DiagnosisApp extends JFrame implements ActionListener{
+    public static final String NEWLINE = "\n";
+    
+    public void log(String text, Color color) {
+        logger.setForeground(color);
+        logger.append(text);
+    }
+    
+    public void logln(String text, Color color) {
+        logger.setForeground(color);
+        logger.append(text + NEWLINE);
+    }
     
         /**
          * Main method of the application.
@@ -35,11 +50,6 @@ public class DiagnosisApp extends javax.swing.JFrame {
             catch (IllegalAccessException e) {
                // handle exception
             }
-            
-//            String file1 = "TestFiles/sampleCorrectGraph";
-//            model.setNeighboursMatrix(controller.loadNeighboursMatrix(file1));
-//            String file2 = "TestFiles/sampleCorrectCoordinates";
-//            model.setCoordinatesMatrix(controller.loadCoordinatesMatrix(file2));
 
             /* Create and display the form */
             java.awt.EventQueue.invokeLater(new Runnable() {
@@ -47,9 +57,6 @@ public class DiagnosisApp extends javax.swing.JFrame {
                     new DiagnosisApp().setVisible(true);
                 }
             });
-
-            
-                
 	}
 
     /**
@@ -71,26 +78,24 @@ public class DiagnosisApp extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         logger = new javax.swing.JTextArea();
         questionField = new javax.swing.JTextField();
+        questionField.addActionListener(this);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         logger.setEditable(false);
         logger.setBackground(new java.awt.Color(153, 153, 153));
         logger.setColumns(20);
+        logger.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         logger.setForeground(new java.awt.Color(0, 0, 0));
         logger.setRows(5);
         logger.setToolTipText("");
         jScrollPane1.setViewportView(logger);
 
         questionField.setBackground(new java.awt.Color(153, 153, 153));
+        questionField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         questionField.setForeground(new java.awt.Color(0, 0, 0));
         questionField.setToolTipText("Your question here");
         questionField.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Question", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, new java.awt.Color(0, 0, 0)));
-        questionField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                questionFieldActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -107,7 +112,7 @@ public class DiagnosisApp extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(questionField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -116,14 +121,16 @@ public class DiagnosisApp extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void questionFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_questionFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_questionFieldActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea logger;
     private javax.swing.JTextField questionField;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String text = questionField.getText();
+        logln(text, Color.BLUE);
+        questionField.selectAll();
+    }
 }
