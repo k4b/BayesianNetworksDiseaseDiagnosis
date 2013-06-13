@@ -5,15 +5,18 @@
 
 package diseasediagnosis;
 
+import datastructures.DiseaseClue;
+
 /**
  * 
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author czarek zawadka 
  */
-public class DiseaseSymptom {
+public class DiseaseSymptom extends DiseaseClue {
+
+	public DiseaseSymptom(String name) {
+		super(name);
+	}
     
-    private String name;
+
     
-    public DiseaseSymptom(String name) {
-        this.name = name;
-    }
 }

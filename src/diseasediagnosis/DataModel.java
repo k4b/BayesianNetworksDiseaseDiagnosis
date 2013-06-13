@@ -8,7 +8,6 @@ package diseasediagnosis;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import datastructures.DiseaseSymptom;
 
 /**
  * 
