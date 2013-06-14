@@ -7,6 +7,9 @@ package diseasediagnosis;
 
 import java.util.HashMap;
 
+import datastructures.DiseaseSymptom;
+
+
 /**
  * 
  * @author Karol Abramczyk
