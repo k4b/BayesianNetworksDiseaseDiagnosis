@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 
-package diseasediagnosis;
+package datastructures;
 
-import datastructures.DiseaseClue;
 
 /**
  * 

@@ -1,6 +1,7 @@
 package diseasediagnosis;
 
-import diseasediagnosis.DiseaseSymptom;
+import datastructures.DiseaseSymptom;
+
 import java.util.ArrayList;
 
 
