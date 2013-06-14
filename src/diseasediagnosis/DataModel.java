@@ -5,12 +5,11 @@
 
 package diseasediagnosis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * 
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author Karol Abramczyk
  */
 public class DataModel {
     private HashMap<String, DiseaseSymptom> symptoms;

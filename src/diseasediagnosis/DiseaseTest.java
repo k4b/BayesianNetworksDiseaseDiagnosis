@@ -7,7 +7,7 @@ package diseasediagnosis;
 
 /**
  * 
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @author Karol Abramczyk
  */
 public class DiseaseTest {
 
