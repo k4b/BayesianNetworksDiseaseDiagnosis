@@ -5,6 +5,7 @@
 
 package datastructures;
 
+import chatBot.SymptomsOccurence;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,8 +65,18 @@ public class Disease {
         this.tests = tests;
     }
          
-    public ArrayList getSymptomNames() {
-        return new ArrayList(symptoms.keySet());
+    public ArrayList<String> getSymptomNames() {
+        ArrayList symptomNames = new ArrayList();
+        for(DiseaseClue clue : symptoms.keySet()) {
+            symptomNames.add(clue.getName());
+        }
+        return symptomNames;
+    }
+    
+    public ArrayList<String> getDiffSymptomNames(ArrayList<String> currentSymptoms) {
+        ArrayList<String> diseaseSymptoms = getSymptomNames();
+        diseaseSymptoms.removeAll(currentSymptoms);
+        return diseaseSymptoms;
     }
     
     public String tosString() {

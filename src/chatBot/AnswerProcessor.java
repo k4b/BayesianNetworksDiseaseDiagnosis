@@ -7,6 +7,7 @@ package chatBot;
 import diseasediagnosis.DataModel;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,7 +80,7 @@ public class AnswerProcessor {
 
     }
     
-    public ArrayList<String> searchSymptoms(String text) throws IOException, ParseException {
+    public SymptomsOccurence searchSymptoms(String text) throws IOException, ParseException {
         text = text.toLowerCase();
         ArrayList stems = procesAnswer(text);
 
@@ -105,11 +106,12 @@ public class AnswerProcessor {
         ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
         // 4. display results        
-        ArrayList results = new ArrayList();
+        SymptomsOccurence results = new SymptomsOccurence();
         for(int i=0;i<hits.length;++i) {
             int docId = hits[i].doc;
             Document d = searcher.doc(docId);
-            results.add(d.get(SYMPTOM));
+            
+            results.put(d.get(SYMPTOM), new Boolean(true));
         }
         
         System.out.println("Found " + hits.length + " symptoms:");
