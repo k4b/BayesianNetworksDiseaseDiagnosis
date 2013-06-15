@@ -17,24 +17,25 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.lucene.queryparser.classic.ParseException;
+import chatBot.*;
 
 /**
  *
  * @author Karol Abramczyk
  */
-public class DiagnosisApp extends JFrame implements ActionListener{
+public class DiagnosisApp extends JFrame {
     public static final String NEWLINE = "\n";
     public static final String SAMPLE_ANSWER = "I am coughing and sneezing, i have fever, my muscles are paining, i feel weak,"
             + " i am loosing hair and vomit, my head is itching, i have skin lesions and i have diarrhea";
     private DataModel data;
-    private AnswerProcessor aProcessor;
+    private ChatBot chatbot;
     
     public DiagnosisApp(DataModel data) {
         super();
-        initComponents();
         this.data = data;
-        aProcessor = new AnswerProcessor(data);
-        logln(">> How do you feel?");
+        chatbot = new ChatBot(this, data);
+        initComponents();
+        chatbot.invitation();
         textField.setText(SAMPLE_ANSWER);
         textField.requestFocus();
     }
@@ -59,23 +60,11 @@ public class DiagnosisApp extends JFrame implements ActionListener{
         logger.append(text + NEWLINE);
     }
     
-    public void analyzeInput(String text) {
-        try {
-                ArrayList foundSymptoms = aProcessor.searchSymptoms(text);
-                logln(">> Found " + foundSymptoms.size() + " symptoms:");
-                logln(">> " + foundSymptoms.toString());
-        } catch (IOException ex) {
-            Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
         /**
          * Main method of the application.
 	 * @param args application call parameters.
 	 */
-	public static void main(String[] args) {
+    public static void main(String[] args) {
             try {
                     // Set System L&F
                 UIManager.setLookAndFeel(
@@ -122,7 +111,7 @@ public class DiagnosisApp extends JFrame implements ActionListener{
         jScrollPane1 = new javax.swing.JScrollPane();
         logger = new javax.swing.JTextArea();
         textField = new javax.swing.JTextField();
-        textField.addActionListener(this);
+        textField.addActionListener(chatbot);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -171,13 +160,12 @@ public class DiagnosisApp extends JFrame implements ActionListener{
     private javax.swing.JTextField textField;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String text = textField.getText();
-        logln(text);
-//        logger.setForeground(Color.BLUE);
-        textField.selectAll();
-        analyzeInput(text);
+    public javax.swing.JTextArea getLogger() {
+        return logger;
+    }
+
+    public javax.swing.JTextField getTextField() {
+        return textField;
     }
     
     

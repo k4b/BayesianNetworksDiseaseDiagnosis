@@ -90,7 +90,7 @@
         </Property>
       </Properties>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="textField.addActionListener(this);"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="textField.addActionListener(chatbot);"/>
       </AuxValues>
     </Component>
   </SubComponents>
