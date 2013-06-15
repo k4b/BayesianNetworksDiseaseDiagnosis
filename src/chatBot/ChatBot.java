@@ -75,7 +75,7 @@ public class ChatBot implements ActionListener {
         if(data.getSymptoms().size() > symptomsOccurence.size()) {
             Disease disease = generateSampleDisease();  //should be most probable disease found by bayesian network
             lastDisease = disease;
-            System.out.println(disease.tosString());
+            System.out.println(disease.toString());
             symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
             System.out.println("Need to ask: " + symptomsToAsk.toString());
             if(symptomsToAsk != null && symptomsToAsk.size() > 0) {
@@ -86,30 +86,37 @@ public class ChatBot implements ActionListener {
     
     private void askForLackingSymptom(Disease disease, boolean isFirstCall) {
         String word = "";
-        if(isFirstCall == false && disease.getName().equals(lastDisease.getName())) {
+        if(isFirstCall == false && disease != null && disease.getName().equals(lastDisease.getName())) {
             word = "still ";
         }
         view.logln(">> It " + word + "looks that you have " + disease.getName() + ". But tell me how about " + symptomsToAsk.get(0) + "?");
-        symptomsToAsk.remove(0);
         state = State.AskedSpecificQuestion;
     }
     
     private void processSpecificAnswer(SymptomsOccurence symptomsOccurence) {
-        totalSymptomsOccurence.putAll(symptomsOccurence);
-        Disease disease = generateSampleDisease();  //should be most probable disease found by bayesian network
-        symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
-        System.out.println("Need to ask: " + symptomsToAsk.toString());
-        if(symptomsToAsk.size() > 0) {
-            askForLackingSymptom(disease, false);
+        if(symptomsOccurence.size() == 0){
+            view.logln(">> Please answer in complete sentence.");
+            System.out.println("Need to ask: " + symptomsToAsk.toString());
+            askForLackingSymptom(lastDisease, false);
         } else {
-            state = State.Idle;
-            view.logln(">> Now I'm sure - you have " + disease.getName() + "!");
-            System.out.println("All symptoms: " + totalSymptomsOccurence.toString());
+            symptomsToAsk.removeAll(totalSymptomsOccurence.keySet());
+            totalSymptomsOccurence.putAll(symptomsOccurence);
+            Disease disease = generateSampleDisease();  //should be most probable disease found by bayesian network
+            lastDisease = disease;
+            symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
+            System.out.println("Need to ask: " + symptomsToAsk.toString());
+            if(symptomsToAsk.size() > 0) {
+                askForLackingSymptom(disease, false);
+            } else {
+                state = State.Idle;
+                view.logln(">> Now I'm sure - you have " + disease.getName() + "!");
+                System.out.println("All symptoms: " + totalSymptomsOccurence.toString());
+            }
         }
     }
     
     private void processIdleAnswer(SymptomsOccurence symptomsOccurence) {
-        view.logln(">> Please, give me some more time...");
+        view.logln(">> As I told you, most probably you have " + lastDisease.getName() + ". Now let me have a brake.");
     }
     
     @Override

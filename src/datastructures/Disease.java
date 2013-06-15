@@ -79,7 +79,8 @@ public class Disease {
         return diseaseSymptoms;
     }
     
-    public String tosString() {
+    @Override
+    public String toString() {
         String output = "";
         output += name + ", ";
         for (Map.Entry<DiseaseClue, DiseaseProbabilityBean> entry : symptoms.entrySet()) {
