@@ -7,9 +7,7 @@ package diseasediagnosis;
 
 import java.util.HashMap;
 
-import datastructures.DiseaseSymptom;   
-import java.util.ArrayList;
-import java.util.Set;
+import datastructures.DiseaseSymptom;
 
 
 /**
