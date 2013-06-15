@@ -5,6 +5,7 @@
 
 package datastructures;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,16 +15,68 @@ import java.util.Map;
  */
 public class Disease {
 
-	 private String name;
-	 
-	 //a-priori probability P(D)
-	 private double diseaseProbability;
-	 
-	 private Map<DiseaseClue, DiseaseProbabilityBean> symtpoms; 
-	 private Map<DiseaseClue, DiseaseProbabilityBean> tests;
-	
-	 
-	 
+    private String name;
+    //a-priori probability P(D)
+    private double diseaseProbability;
+    private Map<DiseaseClue, DiseaseProbabilityBean> symptoms; 
+    private Map<DiseaseClue, DiseaseProbabilityBean> tests;
 
-	 
+    public Disease() {
+        symptoms = new HashMap<>();
+        tests = new HashMap<>();
+    }
+    
+    public Disease(String name) {
+        symptoms = new HashMap<>();
+        tests = new HashMap<>();
+        this.name = name;
+    }  
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getDiseaseProbability() {
+        return diseaseProbability;
+    }
+
+    public void setDiseaseProbability(double diseaseProbability) {
+        this.diseaseProbability = diseaseProbability;
+    }
+
+    public Map<DiseaseClue, DiseaseProbabilityBean> getSymptoms() {
+        return symptoms;
+    }
+
+    public void setSymptoms(Map<DiseaseClue, DiseaseProbabilityBean> symtpoms) {
+        this.symptoms = symtpoms;
+    }
+
+    public Map<DiseaseClue, DiseaseProbabilityBean> getTests() {
+        return tests;
+    }
+
+    public void setTests(Map<DiseaseClue, DiseaseProbabilityBean> tests) {
+        this.tests = tests;
+    }
+         
+    public ArrayList getSymptomNames() {
+        return new ArrayList(symptoms.keySet());
+    }
+    
+    public String tosString() {
+        String output = "";
+        output += name + ", ";
+        for (Map.Entry<DiseaseClue, DiseaseProbabilityBean> entry : symptoms.entrySet()) {
+            DiseaseClue diseaseClue = entry.getKey();
+            DiseaseProbabilityBean diseaseProbabilityBean = entry.getValue();
+            output += diseaseProbabilityBean.getSymptom().getName() + " " + diseaseProbabilityBean.getpSgivenD() + " " + diseaseProbabilityBean.getpSgivenNotD();
+            output += ", ";
+        }
+        return output;
+    }
 }

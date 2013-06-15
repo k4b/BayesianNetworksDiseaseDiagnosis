@@ -32,7 +32,7 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 /**
  *
- * @author karol
+ * @author Karol Abramczyk
  */
 public class AnswerProcessor {
     
