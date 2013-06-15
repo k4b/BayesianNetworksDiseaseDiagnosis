@@ -7,7 +7,9 @@ package diseasediagnosis;
 
 import java.util.HashMap;
 
-import datastructures.DiseaseSymptom;
+import datastructures.DiseaseSymptom;   
+import java.util.ArrayList;
+import java.util.Set;
 
 
 /**
@@ -16,6 +18,8 @@ import datastructures.DiseaseSymptom;
  */
 public class DataModel {
     private HashMap<String, DiseaseSymptom> symptoms;
+    private String[] symptomNames = {"sneezing", "cough", "fever", "skin lesions",
+        "diarrhea", "hair loss", "muscle pain", "itch", "vomiting", "weakness"};
     
     public DataModel() {
         createData();
@@ -23,16 +27,10 @@ public class DataModel {
     
     private void createData() {
         symptoms = new HashMap<>();
-        symptoms.put("sneezing", new DiseaseSymptom("sneezing"));
-        symptoms.put("cough", new DiseaseSymptom("cough"));
-        symptoms.put("fever", new DiseaseSymptom("fever"));
-        symptoms.put("skin lesions", new DiseaseSymptom("skin lesions"));
-        symptoms.put("diarrhea", new DiseaseSymptom("diarrhea"));
-        symptoms.put("hair loss", new DiseaseSymptom("hair loss"));
-        symptoms.put("muscle pain", new DiseaseSymptom("muscle pain"));
-        symptoms.put("itch", new DiseaseSymptom("itch"));
-        symptoms.put("vomiting", new DiseaseSymptom("vomiting"));
-        symptoms.put("weakness", new DiseaseSymptom("weakness"));
+        for(int i = 0; i<symptomNames.length; i++) {
+            symptoms.put(symptomNames[i], new DiseaseSymptom(symptomNames[i]));            
+        }
+//        System.out.println(symptoms.toString());
     }
 
     public HashMap<String, DiseaseSymptom> getSymptoms() {

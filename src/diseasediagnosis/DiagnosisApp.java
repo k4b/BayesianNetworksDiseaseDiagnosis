@@ -4,13 +4,19 @@
  */
 package diseasediagnosis;
 
+import chatBot.AnswerProcessor;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.apache.lucene.queryparser.classic.ParseException;
 
 /**
  *
@@ -18,14 +24,21 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class DiagnosisApp extends JFrame implements ActionListener{
     public static final String NEWLINE = "\n";
+    public static final String SAMPLE_ANSWER = "I am coughing and sneezing, i have fever, my muscles are paining, i feel weak,"
+            + " i am loosing hair and vomit, my head is itching, i have skin lesions and i have diarrhea";
     private DataModel data;
+    private AnswerProcessor aProcessor;
     
     public DiagnosisApp(DataModel data) {
         super();
         initComponents();
         this.data = data;
-        logln("Qestion 1?");
+        aProcessor = new AnswerProcessor(data);
+        logln(">> How do you feel?");
+        textField.setText(SAMPLE_ANSWER);
+        textField.requestFocus();
     }
+    
     public void log(String text) {
 //        logger.setForeground(Color.BLUE);
         logger.append(text);
@@ -47,7 +60,15 @@ public class DiagnosisApp extends JFrame implements ActionListener{
     }
     
     public void analyzeInput(String text) {
-        
+        try {
+                ArrayList foundSymptoms = aProcessor.searchSymptoms(text);
+                logln(">> Found " + foundSymptoms.size() + " symptoms:");
+                logln(">> " + foundSymptoms.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
         /**

@@ -14,7 +14,11 @@ public class DiseaseClue {
 
 	 public DiseaseClue(String name) {
 	        this.name = name;
-	    }
+	 }
+         
+         public String toString() {
+             return name;
+         }
 	 
 	 
 }

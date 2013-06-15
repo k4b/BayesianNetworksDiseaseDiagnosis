@@ -16,6 +16,8 @@ public class DiseaseSymptom extends DiseaseClue {
 		super(name);
 	}
     
-
+        public String toString() {
+            return super.toString();
+        }
     
 }
