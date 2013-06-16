@@ -25,7 +25,7 @@ public class Parser {
 
 	private static final String EMPTY_LINE = "";
 
-	private static final String DEFINITION_REGEX = "(and )?has_symptom";
+	private static final String DEFINITION_REGEX = "(and )?(or )?has_symptom";
 
 	private static final int DISEASES_INITIAL_CAPACITY = 500;
 

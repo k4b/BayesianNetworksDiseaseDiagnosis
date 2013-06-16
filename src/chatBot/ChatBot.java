@@ -62,6 +62,7 @@ public class ChatBot implements ActionListener {
                 processGeneralAnswer(symptomsOccurence);
                 break;
             case AskedSpecificQuestion :
+            	
                 processSpecificAnswer(symptomsOccurence);
                 break;
             case Idle :

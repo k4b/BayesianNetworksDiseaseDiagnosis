@@ -1,10 +1,12 @@
 package bayesianNetwork;
 
 import java.util.List;
+import java.util.Map;
 
 import smile.Network;
 import smile.SMILEException;
 import datastructures.Disease;
+import datastructures.DiseaseSymptom;
 
 /**
  * 
@@ -17,6 +19,8 @@ public class NetworkStructure {
 	public static final String YES = "Yes";
 	public static final String NO = "No";
 
+	private Network network;
+	
 	public static double[] concat(double[] first, double[] second) {
 		double[] result = new double[first.length + second.length];
 		System.arraycopy(first, 0, result, 0, first.length);
@@ -25,12 +29,19 @@ public class NetworkStructure {
 	}
 
 	public NetworkStructure() {
-		CreateNetwork();
+//		this.network = CreateNetwork();
+//		Thread th=new Thread(new Runnable() {
+//			  @Override
+//			  public void run() {
+//			    // This implements Runnable.run
+//			  }
+//		});
 	}
 
-	public void CreateNetwork() {
+	public /*synchronized*/ Network CreateNetwork() {
+		Network net = new Network();
+
 		try {
-			Network net = new Network();
 
 			net.addNode(Network.NodeType.Cpt, "Flu");
 			net.setOutcomeId("Flu", 0, YES);
@@ -80,11 +91,11 @@ public class NetworkStructure {
 			double[] cForecastDef = { 0.99, 0.01, 0.01, 0.99 };
 			net.setNodeDefinition("Sneezing", cForecastDef);
 
-			// Writting the network to a file:
 			net.writeFile("tutorial_a.xdsl");
 		} catch (SMILEException e) {
 			System.out.println(e.getMessage());
 		}
+		return network;
 	}
 
 	public void CreateNetwork(List<Disease> diseases) {
@@ -110,6 +121,17 @@ public class NetworkStructure {
 		} catch (SMILEException e) {
 			System.out.println(e.getMessage());
 		}
+	}
+
+	public Network CreateNetwork(Map<String, Disease> diseases,
+			Map<String, DiseaseSymptom> symptoms) {
+
+		Network net = new Network();
+
+		
+		
+		return network;
+
 	}
 
 }

@@ -30,7 +30,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.tartarus.snowball.ext.PorterStemmer;
-
+//import org.apache.lucene.analysis.synonym.* ;
 /**
  *
  * @author Karol Abramczyk
@@ -150,7 +150,6 @@ public class AnswerProcessor {
         return stems;
     }
     
-    //czarek: I will need this in my Parser
     private String stemTerm(String term) {
         PorterStemmer stemmer = new PorterStemmer();
         stemmer.setCurrent(term);
