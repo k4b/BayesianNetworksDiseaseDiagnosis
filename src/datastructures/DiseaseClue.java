@@ -11,7 +11,7 @@ import java.util.Map;
 public class DiseaseClue {
     
     private String name;
-    private Map<Disease, DiseaseProbabilityBean> probabilities; 
+    private Map<Disease, DiseaseProbabilityBean> probabilities = new HashMap<Disease, DiseaseProbabilityBean>(); 
 
     public DiseaseClue(String name) {
            this.name = name;

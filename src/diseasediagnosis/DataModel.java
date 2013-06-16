@@ -6,6 +6,7 @@
 package diseasediagnosis;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import datastructures.DiseaseSymptom;
 
@@ -15,12 +16,12 @@ import datastructures.DiseaseSymptom;
  * @author Karol Abramczyk
  */
 public class DataModel {
-    private HashMap<String, DiseaseSymptom> symptoms;
+    private Map<String, DiseaseSymptom> symptoms;
     private String[] symptomNames = {"sneezing", "cough", "fever", "skin lesions",
         "diarrhea", "hair loss", "muscle pain", "itch", "vomiting", "weakness"};
     
     public DataModel() {
-        createData();
+//        createData();
     }
     
     private void createData() {
@@ -31,7 +32,21 @@ public class DataModel {
 //        System.out.println(symptoms.toString());
     }
 
-    public HashMap<String, DiseaseSymptom> getSymptoms() {
+    public Map<String, DiseaseSymptom> getSymptoms() {
         return symptoms;
     }
+
+	public String[] getSymptomNames() {
+		return symptomNames;
+	}
+
+	public void setSymptomNames(String[] symptomNames) {
+		this.symptomNames = symptomNames;
+	}
+
+	public void setSymptoms(Map<String, DiseaseSymptom> symptoms) {
+		this.symptoms = symptoms;
+	}
+    
+    
 }

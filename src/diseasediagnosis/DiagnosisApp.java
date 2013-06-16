@@ -4,6 +4,7 @@
  */
 package diseasediagnosis;
 
+import Ontology.Parser;
 import chatBot.AnswerProcessor;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -87,7 +88,20 @@ public class DiagnosisApp extends JFrame {
             /* Create and display the form */
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
+                	Parser parser = new Parser();
+                	try {
+					//	parser.parseOntology("resources/ontology/HumanDO_no_xrefs.obo"); //D: 362, S: 715
+					//	parser.parseOntology("resources/ontology/DO_logical_def.obo");//D: 287, S: 582
+					//	parser.parseOntology("resources/ontology/HumanDO_xp.obo");//D: 388, S:768
+						parser.parseOntology("resources/ontology/HumanDO.obo"); //D: 388, S:777
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                     DataModel data = new DataModel();
+                    data.setSymptoms(parser.getSymptoms());
+                    parser.getSymptoms().keySet().toArray(new String[parser.getSymptoms().size()]);
+//                    data.setSymptomNames(parser.getSymptoms());
                     new DiagnosisApp(data).setVisible(true);
                 }
             });

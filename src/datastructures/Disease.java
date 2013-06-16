@@ -23,6 +23,7 @@ public class Disease {
     private Map<DiseaseClue, DiseaseProbabilityBean> tests;
     private String definition;
     
+    
 	public void addSymptom(DiseaseSymptom symptom, DiseaseProbabilityBean probability){
 		symptoms.put(symptom, probability);
 	}
