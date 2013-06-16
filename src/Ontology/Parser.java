@@ -108,7 +108,7 @@ public class Parser {
 					symptom.addDisease(disease, probability);
 					disease.addSymptom(symptom, probability);
 					disease.setDefinition(line);
-					symptoms.put(name, symptom);
+					symptoms.put(stemmedName, symptom);
 				}
 
 				return true;

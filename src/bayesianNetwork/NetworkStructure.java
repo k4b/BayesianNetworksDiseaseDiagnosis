@@ -85,9 +85,9 @@ public class NetworkStructure {
 			net.addOutcome("Sneezing", NO);
 			net.deleteOutcome("Sneezing", 0);
 			net.deleteOutcome("Sneezing", 0);
-
+		//	net.get
 			net.addArc("Flu", "Sneezing");
-
+			
 			double[] cForecastDef = { 0.99, 0.01, 0.01, 0.99 };
 			net.setNodeDefinition("Sneezing", cForecastDef);
 
@@ -129,7 +129,8 @@ public class NetworkStructure {
 		Network net = new Network();
 
 		
-		
+		net.writeFile("inference.xdsl");
+
 		return network;
 
 	}
