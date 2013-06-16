@@ -12,12 +12,23 @@ package datastructures;
  */
 public class DiseaseSymptom extends DiseaseClue {
 
+	private String nonStemmedName;
+
 	public DiseaseSymptom(String name) {
 		super(name);
 	}
-    
-        public String toString() {
-            return super.toString();
-        }
-    
+
+	public String toString() {
+		return super.toString();
+	}
+
+	public String getNonStemmedName() {
+		return nonStemmedName;
+	}
+
+	public void setNonStemmedName(String nonStemmedName) {
+		this.nonStemmedName = nonStemmedName;
+	}
+
+	
 }

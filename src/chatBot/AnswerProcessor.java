@@ -44,6 +44,10 @@ public class AnswerProcessor {
     ArrayList<String> symptomNames;
     Directory index;
     
+    public AnswerProcessor(){
+    	
+    }
+    
     public AnswerProcessor(DataModel datamodel) {
         this.datamodel = datamodel;
         symptomNames = new ArrayList<>(datamodel.getSymptoms().keySet());
@@ -136,7 +140,7 @@ public class AnswerProcessor {
         text = text.replaceAll(",", "");
         text = text.replaceAll("\\.", "");
         
-        ArrayList stems = new ArrayList();
+        ArrayList<String> stems = new ArrayList<String>();
         StringTokenizer tokenizer = new StringTokenizer(text, " ");
         while(tokenizer.hasMoreTokens()) {
             String term = tokenizer.nextToken();
@@ -146,10 +150,32 @@ public class AnswerProcessor {
         return stems;
     }
     
+    //czarek: I will need this in my Parser
     private String stemTerm(String term) {
         PorterStemmer stemmer = new PorterStemmer();
         stemmer.setCurrent(term);
         stemmer.stem();
         return stemmer.getCurrent();
+    }
+    
+    public String stemSentence(String sentence){
+    	ArrayList<String> stmmedArray = procesAnswer(sentence);
+    	StringBuffer stringBuffer = new StringBuffer();
+    	for (String string : stmmedArray) {
+    		stringBuffer.append(string);
+    		stringBuffer.append(" ");   		
+		}
+    	
+    	String concatenatedSentence = stringBuffer.toString();
+    	
+    	if(concatenatedSentence.startsWith(" ")){
+    		concatenatedSentence = concatenatedSentence.substring(1);
+    	}
+
+    	if(concatenatedSentence.endsWith(" ")){
+    		concatenatedSentence = concatenatedSentence.substring(0, concatenatedSentence.length()-1);
+    	}
+    	
+    	return concatenatedSentence.toLowerCase();
     }
 }

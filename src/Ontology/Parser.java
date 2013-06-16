@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import chatBot.AnswerProcessor;
+
 import datastructures.Disease;
 import datastructures.DiseaseClue;
 import datastructures.DiseaseProbabilityBean;
@@ -14,8 +16,6 @@ import datastructures.DiseaseSymptom;
 import datastructures.DiseaseTest;
 
 public class Parser {
-
-	private BufferedReader reader;
 
 	private static final String TERM_PREFIX = "[Term]";
 
@@ -32,8 +32,13 @@ public class Parser {
 	private static final int SYMPTOMS_INITIAL_CAPACITY = 1000;
 
 	private static final int NUMBER_OF_TESTS = 3;
-
+	
+	private AnswerProcessor wordProcessor  = new AnswerProcessor();
+	
+	private BufferedReader reader;
+	
 	private Map <String, Disease> diseases = new HashMap<String, Disease>(DISEASES_INITIAL_CAPACITY);
+	
 	private Map <String, DiseaseSymptom> symptoms = new HashMap<String, DiseaseSymptom>(SYMPTOMS_INITIAL_CAPACITY);
 	//	private Map <String, DiseaseTest> tests;
 
@@ -91,9 +96,11 @@ public class Parser {
 			if(symptomNames.length > 1 ){
 				for (int i =1; i< symptomNames.length; i++) {
 					String name = symptomNames[i].replaceAll(",|\\.", "");
-					DiseaseSymptom symptom = symptoms.get(name);
+					String stemmedName = wordProcessor.stemSentence(name);
+					DiseaseSymptom symptom = symptoms.get(stemmedName);
 					if(symptom == null){
-						symptom = new DiseaseSymptom(name);
+						symptom = new DiseaseSymptom(stemmedName);
+						symptom.setNonStemmedName(name);
 					}
 					DiseaseProbabilityBean probability =new DiseaseProbabilityBean(disease, symptom, 
 							RandGenerator.getPSgivenD(), RandGenerator.getPSgivenNotD());
