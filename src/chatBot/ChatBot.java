@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
+
+import bayesianNetwork.InferenceEngine;
 import datastructures.*;
 import java.util.ArrayList;
 import sun.security.util.DisabledAlgorithmConstraints;
@@ -30,12 +32,15 @@ public class ChatBot implements ActionListener {
     private ArrayList symptomsToAsk;
     private Disease lastDisease;
     
+  //  private InferenceEngine engine;
+    
     public enum State { AskedGeneralQuestion, AskedSpecificQuestion, Testing, Idle };
     
-    public ChatBot(DiagnosisApp view, DataModel data) {
+    public ChatBot(DiagnosisApp view, DataModel data /*, InferenceEngine engine*/) {
         this.view = view;
         this.data = data;
         aProcessor = new AnswerProcessor(data);
+    //    this.engine = engine;
     }
     
     public void invitation() {
@@ -81,6 +86,9 @@ public class ChatBot implements ActionListener {
             System.out.println("Need to ask: " + symptomsToAsk.toString());
             if(symptomsToAsk != null && symptomsToAsk.size() > 0) {
                 askForLackingSymptom(disease, true);
+            } 
+            else{
+            	//ORDER TEST OR finish
             }
         }
     }

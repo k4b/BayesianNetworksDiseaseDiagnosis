@@ -36,6 +36,7 @@ public class InferenceEngine {
 	private List<String> diseases; // alternatively - list of Diseases
 //	private final String networkFileName = "tutorial_a.xdsl";
 	private String mostProbableDisease;
+	private double maxProbability;
 
 //	public static void main(String[] args) {
 //
@@ -73,6 +74,7 @@ public class InferenceEngine {
 			Entry<String, Boolean>  pair = it.next();
 			addEvidence(pair.getKey(), pair.getValue());
 		}
+		//TODO run this in new thread
 		runInference();
 	}
 
@@ -83,8 +85,8 @@ public class InferenceEngine {
 
 	}
 
-	public String findMostLikelyDisease() {
-		return mostProbableDisease;
+	public Pair<String, Double> findMostLikelyDisease() {
+		return new Pair<String, Double> (mostProbableDisease, new Double(maxProbability));
 	}
 
 	public DiseaseTest findMostSuitableTest() {
@@ -94,7 +96,7 @@ public class InferenceEngine {
 
 	private void runInference() {
 		net.clearAllEvidence();
-		double maxProbability = 0;
+		maxProbability = 0;
 		try {
 			for (Pair<String, String> observation : observed) {
 				net.setEvidence(observation.getLeft(), observation.getRight());
