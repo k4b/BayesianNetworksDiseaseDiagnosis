@@ -4,10 +4,16 @@
 package bayesianNetwork;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import smile.Network;
 import smile.SMILEException;
+import datastructures.Disease;
+import datastructures.DiseaseClue;
+import datastructures.DiseaseProbabilityBean;
 import datastructures.DiseaseTest;
 
 /**
@@ -25,9 +31,11 @@ public class Inference {
 	private final String YES = NetworkStructure.YES;
 	private final String NO = NetworkStructure.NO;
 	private Network net;
-	private List<String> diseases; // alternatively - list of Diseases
+	private Map<String, Disease> diseases; // alternatively - list of Diseases
 	private final String networkFileName = "tutorial_a.xdsl";
 	private String mostProbableDisease;
+	public static enum VoITestType {MostProbableElimination, Simple, Exhaustive};
+	
 
 	public static void main(String[] args) {
 
@@ -63,9 +71,37 @@ public class Inference {
 		return mostProbableDisease;
 	}
 
-	public DiseaseTest findMostSuitableTest() {
-		// TODO VoI implementation
+	public DiseaseTest findMostSuitableTest(VoITestType type) {
+		
+		switch (type) {
+		case MostProbableElimination :
+			return MostProbableEliminationTest();
+			
+		default :
+		break;
+		}
+		
 		return null;
+	}
+	
+	private DiseaseTest MostProbableEliminationTest() {
+		DiseaseTest bestTest = null;
+		double testVoI = 0.0f;
+
+		Map<DiseaseClue, DiseaseProbabilityBean> tests = diseases.get(mostProbableDisease).getTests();
+
+		Iterator<Entry<DiseaseClue, DiseaseProbabilityBean>> entries = tests.entrySet().iterator();
+		while (entries.hasNext()) {
+			Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries.next();
+			double VoI = entry.getValue().getpSgivenD()
+					+ entry.getValue().getpSgivenNotD();
+			if (VoI > testVoI) {
+				testVoI = VoI;
+				bestTest = (DiseaseTest) entry.getKey();
+			}
+
+		}
+		return bestTest;
 	}
 
 	private void runInference() {
@@ -75,15 +111,14 @@ public class Inference {
 			for (Pair<String, String> observation : observed) {
 				net.setEvidence(observation.getLeft(), observation.getRight());
 			}
-
 			net.updateBeliefs();
 
-			for (String disease : diseases) {
-				net.getNode(disease);
-				double probab = net.getNodeValue(disease)[0];
+			for (int i = 0; i < diseases.size(); ++i) {
+				net.getNode((diseases.get(i)).getName());
+				double probab = net.getNodeValue(i)[0];
 				if (probab > maxProbability) {
 					maxProbability = probab;
-					this.mostProbableDisease = disease;
+					this.mostProbableDisease = (diseases.get(i)).getName();
 				}
 			}
 
