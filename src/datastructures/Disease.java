@@ -21,7 +21,17 @@ public class Disease {
     private double diseaseProbability;
     private Map<DiseaseClue, DiseaseProbabilityBean> symptoms; 
     private Map<DiseaseClue, DiseaseProbabilityBean> tests;
-
+    private String definition;
+    
+	public void addSymptom(DiseaseSymptom symptom, DiseaseProbabilityBean probability){
+		symptoms.put(symptom, probability);
+	}
+	
+	public void addTest(DiseaseTest test, DiseaseProbabilityBean probability){
+		tests.put(test, probability);
+	}
+	
+	
     public Disease() {
         symptoms = new HashMap<>();
         tests = new HashMap<>();
@@ -78,17 +88,47 @@ public class Disease {
         diseaseSymptoms.removeAll(currentSymptoms);
         return diseaseSymptoms;
     }
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(String definition) {
+		this.definition = definition;
+	}
+
+	@Override
+	public String toString() {
+		return "Disease [name=" + name + ", diseaseProbability="
+				+ diseaseProbability + ", symptoms=" + symptoms + ", tests="
+				+ tests + ", definition=" + definition + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Disease other = (Disease) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
     
-    @Override
-    public String toString() {
-        String output = "";
-        output += name + ", ";
-        for (Map.Entry<DiseaseClue, DiseaseProbabilityBean> entry : symptoms.entrySet()) {
-            DiseaseClue diseaseClue = entry.getKey();
-            DiseaseProbabilityBean diseaseProbabilityBean = entry.getValue();
-            output += diseaseProbabilityBean.getSymptom().getName() + " " + diseaseProbabilityBean.getpSgivenD() + " " + diseaseProbabilityBean.getpSgivenNotD();
-            output += ", ";
-        }
-        return output;
-    }
+    
+    
 }
