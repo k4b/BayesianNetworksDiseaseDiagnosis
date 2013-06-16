@@ -3,82 +3,213 @@
  */
 package bayesianNetwork;
 
+import java.util.ArrayList;
+import java.util.List;
 
-import bayesianNetwork.NetworkStructure;
-
-import smile.*;
+import smile.Network;
+import smile.SMILEException;
+import datastructures.DiseaseTest;
 
 /**
- * @author Marysia
- *
+ * @author maria
+ * 
  */
 public class Inference {
 
 	/**
 	 * @param args
 	 */
+
+	private List<Pair<String, String>> observed; // a list of clues observed for
+													// particular case
+	private final String YES = NetworkStructure.YES;
+	private final String NO = NetworkStructure.NO;
+	private Network net;
+	private List<String> diseases; // alternatively - list of Diseases
+	private final String networkFileName = "tutorial_a.xdsl";
+	private String mostProbableDisease;
+
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		NetworkStructure ns = new NetworkStructure(); 
+
+		// for test/presentation purposes
+		new NetworkStructure();
 		InfereceWithBayesianNetwork();
 	}
-	
-	
-	public static void InfereceWithBayesianNetwork() {
-		 try {
-		   Network net = new Network();
-		   net.readFile("tutorial_a.xdsl"); 
-		   int outcomeIndex;
-		   double[] aValues;
-		       
-		   net.setEvidence("Fever", "Yes");
-		   
-		   // Updating the network:
-		   net.updateBeliefs();
-		   
-		   // Getting the handle of the node "Success":
-		   net.getNode("Flu");
-		   
-		   // Getting the index of the "Failure" outcome:
-		   String[] aSuccessOutcomeIds = net.getOutcomeIds("Flu");
-		   for (outcomeIndex = 0; outcomeIndex < aSuccessOutcomeIds.length; outcomeIndex++)
-		     if ("Yes".equals(aSuccessOutcomeIds[outcomeIndex]))
-		       break;
-		   
-		   // Getting the value of the probability:
-		   aValues = net.getNodeValue("Flu");
-		   double P_FluYesGivenFeverYes = aValues[outcomeIndex];
-		   
-		   System.out.println("P(\"Flu\" = Yes | \"Fever\" = Yes) = " + P_FluYesGivenFeverYes);
-		   
-		   net.setEvidence("BackPain", "Yes");
-		   
-		   // Updating the network:
-		   net.updateBeliefs();
-		   
-		   // Getting the handle of the node "Success":
-		   net.getNode("Flu");
-		   
-		   // Getting the index of the "Failure" outcome:
-		   aSuccessOutcomeIds = net.getOutcomeIds("Flu");
-		   for (outcomeIndex = 0; outcomeIndex < aSuccessOutcomeIds.length; outcomeIndex++)
-		     if ("Yes".equals(aSuccessOutcomeIds[outcomeIndex]))
-		       break;
-		   
-		   // Getting the value of the probability:
-		   aValues = net.getNodeValue("Flu");
-		   double P_FluYesGivenBackPainYes = aValues[outcomeIndex];
-		   
-		   System.out.println("P(\"Flu\" = Yes | \"BackPain\" = Yes) = " + P_FluYesGivenBackPainYes);
-		   
-		  
-		   
-		   
-		 }
-		 catch (SMILEException e) {
-		   System.out.println(e.getMessage());
-		 }
+
+	public Inference() {
+		loadNetworkFromFile();
+		observed = new ArrayList<Pair<String, String>>();
+		mostProbableDisease = null;
+
+	}
+
+	private void loadNetworkFromFile() {
+		try {
+			net = new Network();
+			net.readFile(networkFileName);
+		} catch (SMILEException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public void addEvidence(String clueName, boolean isPositive // TRUE if clue occurs
+																// FALSE if doesn't
+	) {
+		this.observed.add(new Pair<String, String>(clueName, isPositive ? YES : NO));
+
+	}
+
+	public String findMostLikelyDisease() {
+		return mostProbableDisease;
+	}
+
+	public DiseaseTest findMostSuitableTest() {
+		// TODO VoI implementation
+		return null;
+	}
+
+	private void runInference() {
+		net.clearAllEvidence();
+		double maxProbability = 0;
+		try {
+			for (Pair<String, String> observation : observed) {
+				net.setEvidence(observation.getLeft(), observation.getRight());
+			}
+
+			net.updateBeliefs();
+
+			for (String disease : diseases) {
+				net.getNode(disease);
+				double probab = net.getNodeValue(disease)[0];
+				if (probab > maxProbability) {
+					maxProbability = probab;
+					this.mostProbableDisease = disease;
+				}
+			}
+
+		} catch (SMILEException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private static void InfereceWithBayesianNetwork() { // TEST METHOD
+		try {
+			Network net_test = new Network();
+			net_test.readFile("tutorial_a.xdsl");
+
+			double[] aValues;
+
+			net_test.setEvidence("Fever", "Yes");
+
+			net_test.updateBeliefs();
+
+			net_test.getNode("Flu");
+			aValues = net_test.getNodeValue("Flu");
+
+			System.out.println("Fever yes");
+			System.out.println("P(Influenza=T|evidence)= " + aValues[0]);
+			System.out.println("P(Influenza=F|evidence)= " + aValues[1]);
+
+			net_test.clearAllEvidence();
+
+			net_test.setEvidence("Fever", "Yes");
+			// net.setEvidence("BackPain", "Yes");
+			// Updating the network:
+			net_test.updateBeliefs();
+
+			// Getting the handle of the node "Success":
+			net_test.getNode("Clap");
+			aValues = net_test.getNodeValue("Clap");
+
+			System.out.println("Fever yes");
+			System.out.println("P(Clap=T|evidence)= " + aValues[0]);
+			System.out.println("P(Clap=F|evidence)= " + aValues[1]);
+
+			net_test.clearAllEvidence();
+
+			net_test.setEvidence("Fever", "No");
+			// net.setEvidence("BackPain", "Yes");
+			// Updating the network:
+			net_test.updateBeliefs();
+
+			// Getting the handle of the node "Success":
+			net_test.getNode("Flu");
+			aValues = net_test.getNodeValue("Flu");
+
+			System.out.println("Fever no");
+			System.out.println("P(Influenza=T|evidence)= " + aValues[0]);
+			System.out.println("P(Influenza=F|evidence)= " + aValues[1]);
+
+			net_test.clearAllEvidence();
+
+			net_test.setEvidence("Fever", "No");
+			// net.setEvidence("BackPain", "Yes");
+			// Updating the network:
+			net_test.updateBeliefs();
+
+			// Getting the handle of the node "Success":
+			net_test.getNode("Clap");
+			aValues = net_test.getNodeValue("Clap");
+
+			System.out.println("Fever no");
+			System.out.println("P(Clap=T|evidence)= " + aValues[0]);
+			System.out.println("P(Clap=F|evidence)= " + aValues[1]);
+
+			net_test.clearAllEvidence();
+
+			/*
+			 * net.setEvidence("BackPain", "No"); //net.setEvidence("BackPain",
+			 * "Yes"); // Updating the network: net.updateBeliefs();
+			 * 
+			 * net.getNode("Flu"); aValues = net.getNodeValue("Flu");
+			 * System.out.println("BackPain no");
+			 * System.out.println("P(Influenza=T|evidence)= " + aValues[0]);
+			 * System.out.println("P(Influenza=F|evidence)= " + aValues[1]);
+			 * 
+			 * net.clearAllEvidence();
+			 * 
+			 * net.setEvidence("Sneezing", "Yes"); //net.setEvidence("BackPain",
+			 * "Yes"); // Updating the network: net.updateBeliefs();
+			 * 
+			 * net.getNode("Flu"); aValues = net.getNodeValue("Flu");
+			 * System.out.println("Sneezing yes");
+			 * System.out.println("P(Influenza=T|evidence)= " + aValues[0]);
+			 * System.out.println("P(Influenza=F|evidence)= " + aValues[1]);
+			 * 
+			 * net.clearAllEvidence();
+			 * 
+			 * net.setEvidence("Fever", "Yes"); net.setEvidence("BackPain",
+			 * "Yes"); net.setEvidence("Sneezing", "Yes"); // Updating the
+			 * network: net.updateBeliefs();
+			 * 
+			 * net.getNode("Flu"); aValues = net.getNodeValue("Flu");
+			 * 
+			 * System.out.println("fever yes back pain no sneezing Yes");
+			 * System.out.println("P(Influenza=T|evidence)= " + aValues[0]);
+			 * System.out.println("P(Influenza=F|evidence)= " + aValues[1]);
+			 */
+
+		} catch (SMILEException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public class Pair<L, R> {
+
+		private final L left;
+		private final R right;
+
+		public Pair(L left, R right) {
+			this.left = left;
+			this.right = right;
 		}
 
+		public L getLeft() {
+			return left;
+		}
+
+		public R getRight() {
+			return right;
+		}
+	}
 }

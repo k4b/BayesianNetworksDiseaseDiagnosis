@@ -27,6 +27,7 @@ public class DiagnosisApp extends JFrame {
     public static final String NEWLINE = "\n";
     public static final String SAMPLE_ANSWER = "I am coughing and sneezing, i have fever, my muscles are paining, i feel weak,"
             + " i am loosing hair and vomit, my head is itching, i have skin lesions and i have diarrhea";
+    public static final String SHORT_ANSWER = "I am sneezing";
     private DataModel data;
     private ChatBot chatbot;
     
@@ -36,7 +37,7 @@ public class DiagnosisApp extends JFrame {
         chatbot = new ChatBot(this, data);
         initComponents();
         chatbot.invitation();
-        textField.setText(SAMPLE_ANSWER);
+        textField.setText(SHORT_ANSWER);
         textField.requestFocus();
     }
     
