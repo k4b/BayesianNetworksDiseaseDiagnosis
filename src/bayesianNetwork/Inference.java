@@ -4,6 +4,7 @@
 package bayesianNetwork;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,8 @@ public class Inference {
 	private final String YES = NetworkStructure.YES;
 	private final String NO = NetworkStructure.NO;
 	private Network net;
-	private Map<String, Disease> diseases; // alternatively - list of Diseases
+	private Map<String, Disease> diseases; 
+	private Map<DiseaseTest, Boolean> wasTestConducted;
 	private final String networkFileName = "tutorial_a.xdsl";
 	private String mostProbableDisease;
 	public static enum VoITestType {MostProbableElimination, Simple, Exhaustive};
@@ -48,7 +50,8 @@ public class Inference {
 		loadNetworkFromFile();
 		observed = new ArrayList<Pair<String, String>>();
 		mostProbableDisease = null;
-
+		wasTestConducted = new HashMap<DiseaseTest, Boolean>();
+		//listAvailableTests();
 	}
 
 	private void loadNetworkFromFile() {
@@ -64,7 +67,6 @@ public class Inference {
 																// FALSE if doesn't
 	) {
 		this.observed.add(new Pair<String, String>(clueName, isPositive ? YES : NO));
-
 	}
 
 	public String findMostLikelyDisease() {
@@ -75,8 +77,9 @@ public class Inference {
 		
 		switch (type) {
 		case MostProbableElimination :
-			return MostProbableEliminationTest();
-			
+			return mostProbableEliminationTest();
+		case Simple :
+			return simpleTest();
 		default :
 		break;
 		}
@@ -84,13 +87,13 @@ public class Inference {
 		return null;
 	}
 	
-	private DiseaseTest MostProbableEliminationTest() {
+	private DiseaseTest mostProbableEliminationTest() {
 		DiseaseTest bestTest = null;
 		double testVoI = 0.0f;
 
 		Map<DiseaseClue, DiseaseProbabilityBean> tests = diseases.get(mostProbableDisease).getTests();
-
 		Iterator<Entry<DiseaseClue, DiseaseProbabilityBean>> entries = tests.entrySet().iterator();
+		
 		while (entries.hasNext()) {
 			Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries.next();
 			double VoI = entry.getValue().getpSgivenD()
@@ -99,9 +102,24 @@ public class Inference {
 				testVoI = VoI;
 				bestTest = (DiseaseTest) entry.getKey();
 			}
-
 		}
 		return bestTest;
+	}
+	
+	private void listAvailableTests()
+	{
+		for (Disease value : diseases.values()) {
+			for (DiseaseClue test : value.getTests().keySet())
+			{
+				wasTestConducted.put((DiseaseTest) test, false);
+			}
+		}
+	}
+		
+	private DiseaseTest simpleTest()
+	{
+		
+		return null;
 	}
 
 	private void runInference() {
