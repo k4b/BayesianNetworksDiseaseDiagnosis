@@ -102,7 +102,7 @@ public class AnswerProcessor {
         Query q = new QueryParser(Version.LUCENE_40, STEM, analyzer).parse(querystr);
 
         // 3. searchSymptoms
-        int hitsPerPage = 10;
+        int hitsPerPage = 100;
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
         TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
