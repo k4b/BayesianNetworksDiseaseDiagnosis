@@ -1,11 +1,16 @@
 package bayesianNetwork;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import smile.Network;
 import smile.SMILEException;
 import datastructures.Disease;
+import datastructures.DiseaseClue;
+import datastructures.DiseaseProbabilityBean;
 import datastructures.DiseaseSymptom;
 
 /**
@@ -19,7 +24,8 @@ public class NetworkStructure {
 	public static final String YES = "Yes";
 	public static final String NO = "No";
 
-	private Network network;
+	private Network net;
+	private Map<String, List<Integer>> symptomNodes;
 	
 	public static double[] concat(double[] first, double[] second) {
 		double[] result = new double[first.length + second.length];
@@ -38,65 +44,7 @@ public class NetworkStructure {
 //		});
 	}
 
-	public /*synchronized*/ Network CreateNetwork() {
-		Network net = new Network();
-
-		try {
-
-			net.addNode(Network.NodeType.Cpt, "Flu");
-			net.setOutcomeId("Flu", 0, YES);
-			net.setOutcomeId("Flu", 1, NO);
-
-			double[] aDiseaseChance = { 0.5, 0.5 };
-			net.setNodeDefinition("Flu", aDiseaseChance);
-
-			net.addNode(Network.NodeType.Cpt, "Clap");
-			net.setOutcomeId("Clap", 0, YES);
-			net.setOutcomeId("Clap", 1, NO);
-
-			double[] bDiseaseChance = { 0.5, 0.5 };
-			net.setNodeDefinition("Clap", bDiseaseChance);
-
-			net.addNode(Network.NodeType.Cpt, "Fever");
-			net.addOutcome("Fever", YES);
-			net.addOutcome("Fever", NO);
-			net.deleteOutcome("Fever", 0);
-			net.deleteOutcome("Fever", 0);
-			net.addArc("Flu", "Fever");
-			net.addArc("Clap", "Fever");
-
-			double[] aForecastDef = { 0.98, 0.02, 0.99, 0.01, 0.2, 0.8, 0.01,
-					0.99 };
-			net.setNodeDefinition("Fever", aForecastDef);
-
-			net.addNode(Network.NodeType.Cpt, "BackPain");
-			net.addOutcome("BackPain", YES);
-			net.addOutcome("BackPain", NO);
-			net.deleteOutcome("BackPain", 0);
-			net.deleteOutcome("BackPain", 0);
-
-			net.addArc("Flu", "BackPain");
-
-			double[] bForecastDef = { 0.99, 0.01, 0.01, 0.99 };
-			net.setNodeDefinition("BackPain", bForecastDef);
-
-			net.addNode(Network.NodeType.Cpt, "Sneezing");
-			net.addOutcome("Sneezing", YES);
-			net.addOutcome("Sneezing", NO);
-			net.deleteOutcome("Sneezing", 0);
-			net.deleteOutcome("Sneezing", 0);
-		//	net.get
-			net.addArc("Flu", "Sneezing");
-			
-			double[] cForecastDef = { 0.99, 0.01, 0.01, 0.99 };
-			net.setNodeDefinition("Sneezing", cForecastDef);
-
-			net.writeFile("tutorial_a.xdsl");
-		} catch (SMILEException e) {
-			System.out.println(e.getMessage());
-		}
-		return network;
-	}
+	
 
 	public void CreateNetwork(List<Disease> diseases) {
 		try {
@@ -154,7 +102,7 @@ public class NetworkStructure {
 	public Network CreateNetwork(Map<String, Disease> diseases,
 			Map<String, DiseaseSymptom> symptoms) {
 
-		Network net = new Network();
+		Network network = new Network();
 
 		
 		net.writeFile("inference.xdsl");
