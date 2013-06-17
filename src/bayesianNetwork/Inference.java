@@ -34,7 +34,7 @@ public class Inference {
 													// particular case
 	private final String YES = NetworkStructure.YES;
 	private final String NO = NetworkStructure.NO;
-	private Network net;
+	private Network network;
 	private Map<String, Disease> diseases; 
 	private Map<DiseaseTest, Boolean> wasTestConducted;
 	private final String networkFileName = "tutorial_a.xdsl";
@@ -67,9 +67,10 @@ public class Inference {
 //	}
 	
 	public Inference(Map <String, Disease> diseases ,  Map <String, DiseaseSymptom> symptoms) {
+		super();
 		NetworkStructure networkStructure = new NetworkStructure();
 //		net = networkStructure.CreateNetwork(diseases ,  symptoms);
-		net = networkStructure.CreateNetwork();
+		network = networkStructure.CreateNetwork(diseases);
 		observed = new HashSet<Pair<String, String>>();
 		mostProbableDisease = null;
 		wasTestConducted = new HashMap<DiseaseTest, Boolean>();
@@ -84,7 +85,7 @@ public class Inference {
 		}
 		
 		//TODO run this in new thread??
-		//runInference();
+		runInference();
 	}
 
 	public void addEvidence(String clueName, boolean isPositive // TRUE if clue occurs
@@ -149,17 +150,17 @@ public class Inference {
 	}
 
 	private void runInference() {
-		net.clearAllEvidence();
+		network.clearAllEvidence();
 		double maxProbability = 0;
 		try {
 			for (Pair<String, String> observation : observed) {
-				net.setEvidence(observation.getLeft(), observation.getRight());
+				network.setEvidence(observation.getLeft(), observation.getRight());
 			}
-			net.updateBeliefs();
+			network.updateBeliefs();
 
 			for (int i = 0; i < diseases.size(); ++i) {
-				net.getNode((diseases.get(i)).getName());
-				double probab = net.getNodeValue(i)[0];
+				network.getNode((diseases.get(i)).getName());
+				double probab = network.getNodeValue(i)[0];
 				if (probab > maxProbability) {
 					maxProbability = probab;
 					this.mostProbableDisease = (diseases.get(i)).getName();

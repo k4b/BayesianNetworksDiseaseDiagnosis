@@ -1,11 +1,17 @@
 package bayesianNetwork;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import smile.Network;
 import smile.SMILEException;
 import datastructures.Disease;
+import datastructures.DiseaseClue;
+import datastructures.DiseaseProbabilityBean;
 import datastructures.DiseaseSymptom;
 
 /**
@@ -18,8 +24,15 @@ public class NetworkStructure {
 	public static String[] nodeDesc = { "disease", "symptom", "test" };
 	public static final String YES = "Yes";
 	public static final String NO = "No";
+	private HashMap<String, ArrayList<Integer>>symptomNodes;
+	private HashMap<String, Integer>diseaseNodes;
+	private HashMap<String, Integer>testNodes;
 
-	private Network network;
+	private Network net;
+	
+	private static final int SYMPTOM_NOTES_INIT_SIZE = 800;
+	private static final int DISIEASE_NOTES_INIT_SIZE = 400;
+	private static final int TEST_NOTES_INIT_SIZE = 1200;
 	
 	public static double[] concat(double[] first, double[] second) {
 		double[] result = new double[first.length + second.length];
@@ -29,6 +42,7 @@ public class NetworkStructure {
 	}
 
 	public NetworkStructure() {
+		super();
 //		this.network = CreateNetwork();
 //		Thread th=new Thread(new Runnable() {
 //			  @Override
@@ -36,6 +50,10 @@ public class NetworkStructure {
 //			    // This implements Runnable.run
 //			  }
 //		});
+		
+		symptomNodes = new  HashMap<String, ArrayList<Integer>>(SYMPTOM_NOTES_INIT_SIZE);
+		diseaseNodes = new  HashMap<String, Integer>(DISIEASE_NOTES_INIT_SIZE);
+		testNodes = new  HashMap<String, Integer>(TEST_NOTES_INIT_SIZE);
 	}
 
 	public /*synchronized*/ Network CreateNetwork() {
@@ -95,22 +113,31 @@ public class NetworkStructure {
 		} catch (SMILEException e) {
 			System.out.println(e.getMessage());
 		}
-		return network;
+		return net;
 	}
 
-	public void CreateNetwork(List<Disease> diseases) {
+	public Network CreateNetwork(Map <String, Disease> diseases) {
+		net = new Network();
 		try {
-			net = new Network();
 
-			for (Disease disease : diseases) {
-				
-				int position = setNodeProperties(0);
-				net.setNodeName(position, disease.getName());
+			Iterator<Entry<String, Disease>> mapEntries = diseases.entrySet().iterator();
+
+			while (mapEntries.hasNext()) {
+				Disease disease = mapEntries.next().getValue();
+
+
+				//for (Disease disease : diseases) {
+
+				int diseaseNodePosition = setNodeProperties(0);
+				net.setNodeName(diseaseNodePosition, disease.getName());
 
 				double[] aDiseaseChance = { disease.getDiseaseProbability(),
 						1 - disease.getDiseaseProbability() };
-				net.setNodeDefinition(disease.getName(), aDiseaseChance);
+				//net.setNodeDefinition(disease.getName(), aDiseaseChance);
+				net.setNodeDefinition(diseaseNodePosition, aDiseaseChance);
+				diseaseNodes.put( disease.getName(),diseaseNodePosition );
 
+				//TODO extract common method for creating test and symptom nodes
 				// this section sets symptoms parameters
 				Map<DiseaseClue, DiseaseProbabilityBean> symptoms = disease
 						.getSymptoms();
@@ -120,12 +147,18 @@ public class NetworkStructure {
 				while (entries.hasNext()) {
 					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
 							.next();
-					
-					position = setNodeProperties(1);
-					registerSymptomNodes(entry.getKey().getName(), position);
-					net.addArc(net.getNode(disease.getName()), position);
 
-					// TODO set proabilities
+					int symptomNodePosition = setNodeProperties(1);
+					registerSymptomNodes(entry.getKey().getName(), symptomNodePosition);
+				
+					net.addArc(diseaseNodePosition, symptomNodePosition);
+				
+					DiseaseProbabilityBean symptomProbability =  entry.getValue();
+
+					double[] symptomChance = {symptomProbability.getpSgivenD(), 1- symptomProbability.getpSgivenD(),
+								symptomProbability.getpSgivenNotD(), 1- symptomProbability.getpSgivenNotD()};
+					net.setNodeDefinition(symptomNodePosition, symptomChance);
+
 				}
 
 				// this section sets tests parameters
@@ -136,19 +169,27 @@ public class NetworkStructure {
 				while (entries.hasNext()) {
 					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
 							.next();
-								
-					position = setNodeProperties(2);
-					net.setNodeName(position, entry.getKey().getName());
 
-					net.addArc(disease.getName(), entry.getKey().getName());
+					int testNodePosition = setNodeProperties(2);
+					net.setNodeName(testNodePosition, entry.getKey().getName());
 
-					// TODO set proabilities
+					net.addArc(diseaseNodePosition, testNodePosition);
+
+					DiseaseProbabilityBean testProbability =  entry.getValue();
+
+					double[] testChance = {testProbability.getpSgivenD(), 1- testProbability.getpSgivenD(),
+								testProbability.getpSgivenNotD(), 1- testProbability.getpSgivenNotD()};
+					net.setNodeDefinition(testNodePosition, testChance);
+					testNodes.put( entry.getKey().getName(),testNodePosition );
 				}
 			}
 
 		} catch (SMILEException e) {
 			System.out.println(e.getMessage());
 		}
+		net.writeFile("inference.xdsl");
+
+		return net;
 	}
 
 	public Network CreateNetwork(Map<String, Disease> diseases,
@@ -159,8 +200,8 @@ public class NetworkStructure {
 		
 		net.writeFile("inference.xdsl");
 
-		return network;
-
+		return net;
+		
 	}
 	
 	
@@ -180,7 +221,7 @@ public class NetworkStructure {
 		if (null != symptomNodes.get(name)) {
 			symptomNodes.get(name).add(position);
 		} else {
-			List<Integer> temp = new ArrayList<Integer>();
+			ArrayList<Integer> temp = new ArrayList<Integer>();
 			temp.add(position);
 			symptomNodes.put(name, temp);
 		}
