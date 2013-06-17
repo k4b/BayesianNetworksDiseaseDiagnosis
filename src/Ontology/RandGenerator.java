@@ -1,8 +1,10 @@
 package Ontology;
 
+import datastructures.DiseaseTest;
+
 public class RandGenerator {
 	private static double DISEASE_MIN_P = 0.001;
-	private static double DISEASE_MAX_P = 0.05;
+	private static double DISEASE_MAX_P = 0.1;
 	
 	private static double SYNDROM_GIVEN_D_MIN_P = 0.9;
 	private static double SYNDROM_GIVEN_D_MAX_P = 0.999;
@@ -38,4 +40,5 @@ public class RandGenerator {
 	public static double getPTestGivenNotD(){
 		return TEST_POSITIVE_GIVEN_NOT_D_MIN_P + Math.random()* (TEST_POSITIVE_GIVEN_NOT_D_MAX_P-TEST_POSITIVE_GIVEN_NOT_D_MIN_P);
 	}
+
 }

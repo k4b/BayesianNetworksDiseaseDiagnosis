@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
+import Ontology.RandGenerator;
 import bayesianNetwork.Inference;
 import bayesianNetwork.Inference.Pair;
 import datastructures.*;
@@ -32,7 +33,9 @@ public class ChatBot implements ActionListener {
 	private SymptomsOccurence totalSymptomsOccurence;
 	private ArrayList symptomsToAsk;
 	private Disease lastDisease;
+	private double probability;
 
+	private final double PROBABILITY_TRESHOLD = 0.99; 
 	private Inference engine;
 
 	public enum State { AskedGeneralQuestion, AskedSpecificQuestion, Testing, Idle };
@@ -81,9 +84,10 @@ public class ChatBot implements ActionListener {
 		totalSymptomsOccurence = symptomsOccurence;
 		if(symptomsOccurence.size() > 0 && data.getSymptoms().size() > symptomsOccurence.size()) {
 			engine.invokeInference(totalSymptomsOccurence);
-
-			Disease disease = generateSampleDisease();  //should be most probable disease found by bayesian network
+			Pair<Disease, Double> pair = engine.findMostLikelyDisease();
+			Disease disease = pair.getLeft();  //should be most probable disease found by bayesian network
 			lastDisease = disease;
+			probability = pair.getRight();
 			System.out.println(disease.toString());
 			symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
 			System.out.println("Need to ask: " + symptomsToAsk.toString());
@@ -91,7 +95,11 @@ public class ChatBot implements ActionListener {
 				askForLackingSymptom(disease, true);
 			} 
 			else{
-				//ORDER TEST OR finish
+				if(probability >= PROBABILITY_TRESHOLD){
+					finish();
+				}else{
+					orderTests();
+				}
 			}
 		} else{
 			askForAnySymptoms();
@@ -123,18 +131,41 @@ public class ChatBot implements ActionListener {
 			Pair<Disease, Double> pair = engine.findMostLikelyDisease();
 			Disease disease = pair.getLeft();  //should be most probable disease found by bayesian network
 			lastDisease = disease;
+			probability = pair.getRight();
+			System.out.println(disease.toString());
 			symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
 			System.out.println("Need to ask: " + symptomsToAsk.toString());
 			
 			if(symptomsToAsk.size() > 0) {
 				askForLackingSymptom(disease, false);
 			} else {
-				//ORDER TEST OR finish
-				state = State.Idle;
-				view.logln(">> Now I'm sure - you have " + disease.getName() + "!");
-				System.out.println("All symptoms: " + totalSymptomsOccurence.toString());
+				if(probability >= PROBABILITY_TRESHOLD){
+					finish();
+				}else{
+					orderTests();
+				}
 			}
 		}
+	}
+
+	private void orderTests() {
+		view.logln(">> I am not sure, Lest's make some tests...");
+		DiseaseTest test = engine.findMostSuitableTest(Inference.VoITestType.MostProbableElimination, lastDisease);
+		boolean testPositive = engine.getTestResults(test);
+		view.logln(">> " + test.getName()+ "...");
+		if(testPositive){
+			view.logln(">> Great, test result is posotive!");
+		}else{
+			view.logln(">> Great, test result is negative!");
+		}
+			
+		totalSymptomsOccurence.put(test.getName(),testPositive);
+		state=State.AskedSpecificQuestion;
+		processSpecificAnswer(totalSymptomsOccurence);
+	}
+
+	private void finish() {
+		view.logln(">> Now I'm sure - you have " + lastDisease.getName() + "!");	
 	}
 
 	private void processIdleAnswer(SymptomsOccurence symptomsOccurence) {
@@ -151,20 +182,20 @@ public class ChatBot implements ActionListener {
 		processConversation(symptoms);        
 	}
 
-	private Disease generateSampleDisease() {
-		Disease disease = new Disease("cold");
-		disease.setDiseaseProbability(0.9);
-		DiseaseSymptom s1 = new DiseaseSymptom("cough");
-		DiseaseSymptom s2 = new DiseaseSymptom("sneezing");
-		DiseaseSymptom s3 = new DiseaseSymptom("vomiting");
-		DiseaseProbabilityBean bean1 = new DiseaseProbabilityBean(disease, s1, 0.6, 0.3);
-		DiseaseProbabilityBean bean2 = new DiseaseProbabilityBean(disease, s2, 0.8, 0.4);
-		DiseaseProbabilityBean bean3 = new DiseaseProbabilityBean(disease, s3, 0.2, 0.3);
-		disease.getSymptoms().put(s1, bean1);
-		disease.getSymptoms().put(s2, bean2);    
-		disease.getSymptoms().put(s3, bean3);
-		return disease;
-	}
+//	private Disease generateSampleDisease() {
+//		Disease disease = new Disease("cold");
+//		disease.setDiseaseProbability(0.9);
+//		DiseaseSymptom s1 = new DiseaseSymptom("cough");
+//		DiseaseSymptom s2 = new DiseaseSymptom("sneezing");
+//		DiseaseSymptom s3 = new DiseaseSymptom("vomiting");
+//		DiseaseProbabilityBean bean1 = new DiseaseProbabilityBean(disease, s1, 0.6, 0.3);
+//		DiseaseProbabilityBean bean2 = new DiseaseProbabilityBean(disease, s2, 0.8, 0.4);
+//		DiseaseProbabilityBean bean3 = new DiseaseProbabilityBean(disease, s3, 0.2, 0.3);
+//		disease.getSymptoms().put(s1, bean1);
+//		disease.getSymptoms().put(s2, bean2);    
+//		disease.getSymptoms().put(s3, bean3);
+//		return disease;
+//	}
 
 
 

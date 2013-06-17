@@ -15,6 +15,7 @@ import datastructures.Disease;
 import datastructures.DiseaseClue;
 import datastructures.DiseaseProbabilityBean;
 import datastructures.DiseaseSymptom;
+import datastructures.DiseaseTest;
 
 /**
  * 
@@ -31,7 +32,7 @@ public class NetworkStructure {
 	private HashMap<String, Integer>testNodes;
 
 	private Network net;
-	
+	private final String NETWORK_FILENAME = "nference.xdsl";
 	private static final int SYMPTOM_NOTES_INIT_SIZE = 800;
 	private static final int DISIEASE_NOTES_INIT_SIZE = 400;
 	private static final int TEST_NOTES_INIT_SIZE = 1200;
@@ -84,13 +85,13 @@ public class NetworkStructure {
 
 				//TODO extract common method for creating test and symptom nodes
 				// this section sets symptoms parameters
-				Map<DiseaseClue, DiseaseProbabilityBean> symptoms = disease
+				Map<DiseaseSymptom, DiseaseProbabilityBean> symptoms = disease
 						.getSymptoms();
-				Iterator<Entry<DiseaseClue, DiseaseProbabilityBean>> entries = symptoms
+				Iterator<Entry<DiseaseSymptom, DiseaseProbabilityBean>> entries = symptoms
 						.entrySet().iterator();
 
 				while (entries.hasNext()) {
-					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
+					Entry<DiseaseSymptom, DiseaseProbabilityBean> entry = entries
 							.next();
 
 					int symptomNodePosition = setNodeProperties(1);
@@ -107,12 +108,12 @@ public class NetworkStructure {
 				}
 
 				// this section sets tests parameters
-				Map<DiseaseClue, DiseaseProbabilityBean> tests = disease
+				Map<DiseaseTest, DiseaseProbabilityBean> tests = disease
 						.getTests();
-				entries = tests.entrySet().iterator();
+				Iterator<Entry<DiseaseTest, DiseaseProbabilityBean>> entries2 = tests.entrySet().iterator();
 
 				while (entries.hasNext()) {
-					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
+					Entry<DiseaseTest, DiseaseProbabilityBean> entry = entries2
 							.next();
 
 					int testNodePosition = setNodeProperties(2);
@@ -132,22 +133,22 @@ public class NetworkStructure {
 		} catch (SMILEException e) {
 			System.out.println(e.getMessage());
 		}
-		net.writeFile("inference.xdsl");
+		net.writeFile(NETWORK_FILENAME);
 
 		return net;
 	}
 
-	public Network CreateNetwork(Map<String, Disease> diseases,
-			Map<String, DiseaseSymptom> symptoms) {
-
-		Network network = new Network();
-
-		
-		net.writeFile("inference.xdsl");
-
-		return net;
-		
-	}
+//	public Network CreateNetwork(Map<String, Disease> diseases,
+//			Map<String, DiseaseSymptom> symptoms) {
+//
+//		Network network = new Network();
+//
+//		
+//		net.writeFile("inference.xdsl");
+//
+//		return net;
+//		
+//	}
 	
 	
 	private int setNodeProperties(int description)
@@ -172,4 +173,13 @@ public class NetworkStructure {
 		}
 	}
 
+	public Network getNet() {
+		return net;
+	}
+
+	public void setNet(Network net) {
+		this.net = net;
+	}
+
+	
 }

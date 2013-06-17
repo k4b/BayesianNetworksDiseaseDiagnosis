@@ -19,8 +19,8 @@ public class Disease {
     private String name;
     //a-priori probability P(D)
     private double diseaseProbability;
-    private Map<DiseaseClue, DiseaseProbabilityBean> symptoms; 
-    private Map<DiseaseClue, DiseaseProbabilityBean> tests;
+    private Map<DiseaseSymptom, DiseaseProbabilityBean> symptoms; 
+    private Map<DiseaseTest, DiseaseProbabilityBean> tests;
     private String definition;
     
     
@@ -60,19 +60,19 @@ public class Disease {
         this.diseaseProbability = diseaseProbability;
     }
 
-    public Map<DiseaseClue, DiseaseProbabilityBean> getSymptoms() {
+    public Map<DiseaseSymptom, DiseaseProbabilityBean> getSymptoms() {
         return symptoms;
     }
 
-    public void setSymptoms(Map<DiseaseClue, DiseaseProbabilityBean> symtpoms) {
+    public void setSymptoms(Map<DiseaseSymptom, DiseaseProbabilityBean> symtpoms) {
         this.symptoms = symtpoms;
     }
 
-    public Map<DiseaseClue, DiseaseProbabilityBean> getTests() {
+    public Map<DiseaseTest, DiseaseProbabilityBean> getTests() {
         return tests;
     }
 
-    public void setTests(Map<DiseaseClue, DiseaseProbabilityBean> tests) {
+    public void setTests(Map<DiseaseTest, DiseaseProbabilityBean> tests) {
         this.tests = tests;
     }
          

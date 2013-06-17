@@ -36,8 +36,8 @@ public class Inference {
 	private final String NO = NetworkStructure.NO;
 	private Network network;
 	private Map<String, Disease> diseases; 
-	private Map<DiseaseTest, Boolean> wasTestConducted;
-	private final String networkFileName = "tutorial_a.xdsl";
+	private Map<DiseaseTest, Boolean> conductedTests;
+//	private final String networkFileName = "tutorial_a.xdsl";
 	private String mostProbableDisease;
 	public static enum VoITestType {MostProbableElimination, Simple, Exhaustive};
 	private double maxProbability;
@@ -73,7 +73,7 @@ public class Inference {
 		network = networkStructure.CreateNetwork(diseases);
 		observed = new HashSet<Pair<String, String>>();
 		mostProbableDisease = null;
-		wasTestConducted = new HashMap<DiseaseTest, Boolean>();
+		conductedTests = new HashMap<DiseaseTest, Boolean>();
 		//listAvailableTests();
 	}
 	
@@ -99,13 +99,13 @@ public class Inference {
 		return new Pair<Disease, Double> (diseases.get(mostProbableDisease), new Double(maxProbability));
 	}
 
-	public DiseaseTest findMostSuitableTest(VoITestType type) {
+	public DiseaseTest findMostSuitableTest(VoITestType type, Disease disease) {
 		
 		switch (type) {
 		case MostProbableElimination :
-			return mostProbableEliminationTest();
+			return mostProbableEliminationTest(disease);
 		case Simple :
-			return simpleTest();
+			return simpleTest(disease);
 		default :
 		break;
 		}
@@ -114,38 +114,54 @@ public class Inference {
 	}
 	
 
-	private DiseaseTest mostProbableEliminationTest() {
+	private DiseaseTest mostProbableEliminationTest(Disease disease) {
 		DiseaseTest bestTest = null;
 		double testVoI = 0.0f;
 
-		Map<DiseaseClue, DiseaseProbabilityBean> tests = diseases.get(mostProbableDisease).getTests();
-		Iterator<Entry<DiseaseClue, DiseaseProbabilityBean>> entries = tests.entrySet().iterator();
+		Map<DiseaseTest, DiseaseProbabilityBean> tests = disease.getTests();
+		Iterator<Entry<DiseaseTest, DiseaseProbabilityBean>> entries = tests.entrySet().iterator();
 		
 		while (entries.hasNext()) {
-			Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries.next();
+			Entry<DiseaseTest, DiseaseProbabilityBean> entry = entries.next();
 			double VoI = entry.getValue().getpSgivenD()
-					+ entry.getValue().getpSgivenNotD();
+					- entry.getValue().getpSgivenNotD();
 			if (VoI > testVoI) {
 				testVoI = VoI;
 				bestTest = (DiseaseTest) entry.getKey();
 			}
 		}
-		return bestTest;
+		
+		if(!conductedTests.containsKey(bestTest)){
+			conductedTests.put(bestTest, Boolean.TRUE);
+			return bestTest;
+		}
+	
+		return null;
 	}
 	
-	private void listAvailableTests()
+//	private void listAvailableTests()
+//	{
+//		for (Disease value : diseases.values()) {
+//			for (DiseaseClue test : value.getTests().keySet())
+//			{
+//				wasTestConducted.put((DiseaseTest) test, false);
+//			}
+//		}
+//	}
+		
+	private DiseaseTest simpleTest(Disease disease)
 	{
-		for (Disease value : diseases.values()) {
-			for (DiseaseClue test : value.getTests().keySet())
-			{
-				wasTestConducted.put((DiseaseTest) test, false);
+		Iterator<Entry<DiseaseTest, DiseaseProbabilityBean>> iterator = disease.getTests().entrySet().iterator();
+		while(iterator.hasNext()){
+			Entry<DiseaseTest, DiseaseProbabilityBean> entry = iterator.next();
+			DiseaseTest test = entry.getKey();
+			
+			if(!conductedTests.containsKey(test)){
+				conductedTests.put(test, Boolean.TRUE);
+				return test;		
+
 			}
 		}
-	}
-		
-	private DiseaseTest simpleTest()
-	{
-		
 		return null;
 	}
 
@@ -291,5 +307,18 @@ public class Inference {
 		public R getRight() {
 			return right;
 		}
+	}
+
+	public boolean getTestResults(DiseaseTest test) {
+		double totalP = 0;
+		Entry<Disease, DiseaseProbabilityBean> entry = test.getProbabilities().entrySet().iterator().next();
+		Disease d = entry.getKey();
+		DiseaseProbabilityBean p = entry.getValue();
+		totalP = d.getDiseaseProbability() * p.getpSgivenD() + (1-d.getDiseaseProbability())*p.getpSgivenNotD();	
+		if(Math.random() > totalP)
+			return false;
+		
+		return true;
+		
 	}
 }
