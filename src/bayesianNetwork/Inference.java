@@ -1,19 +1,18 @@
+package bayesianNetwork;
+
 /**
  * 
  */
-package bayesianNetwork;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import chatBot.SymptomsOccurence;
 
 import smile.Network;
 import smile.SMILEException;
+import chatBot.SymptomsOccurence;
 import datastructures.Disease;
 import datastructures.DiseaseClue;
 import datastructures.DiseaseProbabilityBean;
@@ -31,7 +30,7 @@ public class Inference {
 	 */
 
 	private HashSet<Pair<String, String>> observed; // a list of clues observed for
-													// particular case
+	private HashSet<Pair<Integer, String>> observedNodes;								// particular case
 	private final String YES = NetworkStructure.YES;
 	private final String NO = NetworkStructure.NO;
 	private Network network;
@@ -41,6 +40,7 @@ public class Inference {
 	private String mostProbableDisease;
 	public static enum VoITestType {MostProbableElimination, Simple, Exhaustive};
 	private double maxProbability;
+	private NetworkStructure networkStructure;
 
 
 //	public static void main(String[] args) {
@@ -68,10 +68,11 @@ public class Inference {
 	
 	public Inference(Map <String, Disease> diseases ,  Map <String, DiseaseSymptom> symptoms) {
 		super();
-		NetworkStructure networkStructure = new NetworkStructure();
+		networkStructure = new NetworkStructure();
 //		net = networkStructure.CreateNetwork(diseases ,  symptoms);
 		network = networkStructure.CreateNetwork(diseases);
 		observed = new HashSet<Pair<String, String>>();
+		observedNodes = new HashSet<Pair<Integer, String>>();
 		mostProbableDisease = null;
 		conductedTests = new HashMap<DiseaseTest, Boolean>();
 		//listAvailableTests();
@@ -91,7 +92,24 @@ public class Inference {
 	public void addEvidence(String clueName, boolean isPositive // TRUE if clue occurs
 																// FALSE if doesn't
 	) {
-		this.observed.add(new Pair<String, String>(clueName, isPositive ? YES : NO));
+		this.observed.add(new Pair<String, String>(clueName, isPositive ? YES
+				: NO));
+		ArrayList<Integer> nodeIDs = networkStructure
+				.resolveClueToNode(clueName);
+		if (null != nodeIDs) {
+			if (!nodeIDs.isEmpty()) {
+				for (Integer position : nodeIDs) {
+					this.observedNodes.add(new Pair<Integer, String>(position,
+							isPositive ? YES : NO));
+				}
+			} else {
+				System.out
+						.println("addEvidence error: clue is not added to bayesian network");
+			}
+		} else {
+			System.out.println("addEvidence error: no clue on the list");
+		}
+
 	}
 
 
@@ -169,8 +187,10 @@ public class Inference {
 		network.clearAllEvidence();
 		double maxProbability = 0;
 		try {
-			for (Pair<String, String> observation : observed) {
-				network.setEvidence(observation.getLeft(), observation.getRight());
+			for (Pair<Integer, String> observation : observedNodes) {
+
+				network.setEvidence(observation.getLeft(),
+						observation.getRight());
 			}
 			network.updateBeliefs();
 

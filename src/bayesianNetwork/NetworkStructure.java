@@ -3,9 +3,6 @@ package bayesianNetwork;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -151,6 +148,7 @@ public class NetworkStructure {
 //	}
 	
 	
+	
 	private int setNodeProperties(int description)
 	{
 		int position = net.addNode(Network.NodeType.Cpt);
@@ -171,6 +169,18 @@ public class NetworkStructure {
 			temp.add(position);
 			symptomNodes.put(name, temp);
 		}
+	}
+	
+	public ArrayList<Integer> resolveClueToNode(String clueName) {
+		if (null != testNodes.get(clueName)) {
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			temp.add(testNodes.get(clueName));
+			return temp;
+		}
+		if (null != symptomNodes.get(clueName)) {
+			return symptomNodes.get(clueName);
+		}
+		return null;
 	}
 
 	public Network getNet() {
