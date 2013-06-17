@@ -100,22 +100,50 @@ public class NetworkStructure {
 
 	public void CreateNetwork(List<Disease> diseases) {
 		try {
-			Network net = new Network();
+			net = new Network();
 
 			for (Disease disease : diseases) {
-
-				net.addNode(Network.NodeType.Cpt, disease.getName());
-				net.setNodeDescription(disease.getName(), nodeDesc[0]);
-
-				net.setOutcomeId(disease.getName(), 0, YES);
-				net.setOutcomeId(disease.getName(), 1, NO);
+				
+				int position = setNodeProperties(0);
+				net.setNodeName(position, disease.getName());
 
 				double[] aDiseaseChance = { disease.getDiseaseProbability(),
 						1 - disease.getDiseaseProbability() };
 				net.setNodeDefinition(disease.getName(), aDiseaseChance);
 
-				// List<Value> list = new ArrayList<Value>(map.values());
+				// this section sets symptoms parameters
+				Map<DiseaseClue, DiseaseProbabilityBean> symptoms = disease
+						.getSymptoms();
+				Iterator<Entry<DiseaseClue, DiseaseProbabilityBean>> entries = symptoms
+						.entrySet().iterator();
 
+				while (entries.hasNext()) {
+					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
+							.next();
+					
+					position = setNodeProperties(1);
+					registerSymptomNodes(entry.getKey().getName(), position);
+					net.addArc(net.getNode(disease.getName()), position);
+
+					// TODO set proabilities
+				}
+
+				// this section sets tests parameters
+				Map<DiseaseClue, DiseaseProbabilityBean> tests = disease
+						.getTests();
+				entries = tests.entrySet().iterator();
+
+				while (entries.hasNext()) {
+					Entry<DiseaseClue, DiseaseProbabilityBean> entry = entries
+							.next();
+								
+					position = setNodeProperties(2);
+					net.setNodeName(position, entry.getKey().getName());
+
+					net.addArc(disease.getName(), entry.getKey().getName());
+
+					// TODO set proabilities
+				}
 			}
 
 		} catch (SMILEException e) {
@@ -133,6 +161,29 @@ public class NetworkStructure {
 
 		return network;
 
+	}
+	
+	
+	private int setNodeProperties(int description)
+	{
+		int position = net.addNode(Network.NodeType.Cpt);
+		net.setOutcomeId(position, 0, YES);
+		net.setOutcomeId(position, 1, NO);
+		net.setNodeDescription(position, nodeDesc[description]);
+		
+		return position;
+		
+	}
+	
+	private void registerSymptomNodes(String name, int position) {
+
+		if (null != symptomNodes.get(name)) {
+			symptomNodes.get(name).add(position);
+		} else {
+			List<Integer> temp = new ArrayList<Integer>();
+			temp.add(position);
+			symptomNodes.put(name, temp);
+		}
 	}
 
 }
