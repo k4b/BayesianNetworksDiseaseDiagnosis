@@ -19,7 +19,7 @@ public class DiseaseSymptom extends DiseaseClue {
 	}
 
 	public String toString() {
-		return super.toString();
+		return nonStemmedName;
 	}
 
 	public String getNonStemmedName() {
@@ -30,5 +30,13 @@ public class DiseaseSymptom extends DiseaseClue {
 		this.nonStemmedName = nonStemmedName;
 	}
 
+	@Override
+	public String getName() {
+		return nonStemmedName;
+	}
+
+	public String getStemmedName(){
+		return name;
+	}
 	
 }

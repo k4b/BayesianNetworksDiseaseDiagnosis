@@ -9,6 +9,7 @@ import diseasediagnosis.DiagnosisApp;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -17,7 +18,13 @@ import Ontology.RandGenerator;
 import bayesianNetwork.Inference;
 import bayesianNetwork.Inference.Pair;
 import datastructures.*;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import sun.security.util.DisabledAlgorithmConstraints;
 
 /**
@@ -31,12 +38,14 @@ public class ChatBot implements ActionListener {
 	private AnswerProcessor aProcessor;
 	private State state = State.Idle;
 	private SymptomsOccurence totalSymptomsOccurence;
-	private ArrayList symptomsToAsk;
+	private ArrayList<String> symptomsToAsk;
 	private Disease lastDisease;
 	private double probability;
 
 	private final double PROBABILITY_TRESHOLD = 0.99; 
 	private Inference engine;
+	private String lastAskedSymptom;
+	private boolean testsDone = false;
 
 	public enum State { AskedGeneralQuestion, AskedSpecificQuestion, Testing, Idle };
 
@@ -56,6 +65,19 @@ public class ChatBot implements ActionListener {
 		SymptomsOccurence foundSymptoms = null;
 		try {
 			foundSymptoms = aProcessor.searchSymptoms(text);
+			
+			boolean containsNegation = checkNegation(text);
+			boolean containsConfirmation = checkConfirmation(text);
+			
+			if(state.equals(State.AskedSpecificQuestion) && containsNegation){
+				foundSymptoms = new SymptomsOccurence();
+				foundSymptoms.put(lastAskedSymptom, false);
+
+			}else if(state.equals(State.AskedSpecificQuestion) && containsConfirmation){
+				foundSymptoms = new SymptomsOccurence();
+				foundSymptoms.put(lastAskedSymptom, true);
+			}
+				
 		} catch (IOException ex) {
 			Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
 		} catch (ParseException ex) {
@@ -63,6 +85,24 @@ public class ChatBot implements ActionListener {
 		} finally {
 			return foundSymptoms;
 		}
+	}
+
+	private boolean checkConfirmation(String text) {
+		String[] tags = text.split("[\\s,;]+");
+		List<String> listOfTags = Arrays.asList(tags);
+		if (listOfTags.contains("yes")){
+				return true;
+		}
+		return false;
+	}
+
+	private boolean checkNegation(String text) {
+		String[] tags = text.split("[\\s,;]+");
+		List<String> listOfTags = Arrays.asList(tags);
+		if (listOfTags.contains("no")){
+				return true;
+		}
+		return false;
 	}
 
 	private void processConversation(SymptomsOccurence symptomsOccurence) {
@@ -89,13 +129,14 @@ public class ChatBot implements ActionListener {
 			lastDisease = disease;
 			probability = pair.getRight();
 			System.out.println(disease.toString());
+			System.out.println("Probability: " + probability);
 			symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
 			System.out.println("Need to ask: " + symptomsToAsk.toString());
 			if(symptomsToAsk != null && symptomsToAsk.size() > 0) {
 				askForLackingSymptom(disease, true);
 			} 
 			else{
-				if(probability >= PROBABILITY_TRESHOLD){
+				if(probability >= PROBABILITY_TRESHOLD || testsDone){
 					finish();
 				}else{
 					orderTests();
@@ -111,12 +152,14 @@ public class ChatBot implements ActionListener {
 	}
 
 	private void askForLackingSymptom(Disease disease, boolean isFirstCall) {
+		
 		String word = "";
 		if(isFirstCall == false && disease != null && disease.getName().equals(lastDisease.getName())) {
 			word = "still ";
 		}
 		view.logln(">> It " + word + "looks that you have " + disease.getName() + ". But tell me how about " + symptomsToAsk.get(0) + "?");
 		state = State.AskedSpecificQuestion;
+		lastAskedSymptom = symptomsToAsk.get(0);
 	}
 
 	private void processSpecificAnswer(SymptomsOccurence symptomsOccurence) {
@@ -126,20 +169,22 @@ public class ChatBot implements ActionListener {
 			askForLackingSymptom(lastDisease, false);
 		} else {
 			symptomsToAsk.removeAll(totalSymptomsOccurence.keySet());
-			totalSymptomsOccurence.putAll(symptomsOccurence);
+			updateOccurances(symptomsOccurence);
+
 			engine.invokeInference(totalSymptomsOccurence);
 			Pair<Disease, Double> pair = engine.findMostLikelyDisease();
 			Disease disease = pair.getLeft();  //should be most probable disease found by bayesian network
 			lastDisease = disease;
 			probability = pair.getRight();
 			System.out.println(disease.toString());
+			System.out.println("Probability: " + probability);
 			symptomsToAsk = disease.getDiffSymptomNames(new ArrayList<>(totalSymptomsOccurence.keySet()));
 			System.out.println("Need to ask: " + symptomsToAsk.toString());
 			
 			if(symptomsToAsk.size() > 0) {
 				askForLackingSymptom(disease, false);
 			} else {
-				if(probability >= PROBABILITY_TRESHOLD){
+				if(probability >= PROBABILITY_TRESHOLD || testsDone ){
 					finish();
 				}else{
 					orderTests();
@@ -148,10 +193,29 @@ public class ChatBot implements ActionListener {
 		}
 	}
 
+	private void updateOccurances(SymptomsOccurence symptomsOccurence) {
+		
+		Iterator<Entry<String, Boolean>> iterator = symptomsOccurence.entrySet().iterator();
+		while (iterator.hasNext()) {
+			totalSymptomsOccurence.remove(iterator.next().getKey());			
+		}
+
+		totalSymptomsOccurence.putAll(symptomsOccurence);
+		
+	}
+
 	private void orderTests() {
 		view.logln(">> I am not sure, Lest's make some tests...");
 		DiseaseTest test = engine.findMostSuitableTest(Inference.VoITestType.MostProbableElimination, lastDisease);
+		if(test == null){
+			testsDone = true;
+			view.logln(">> There are no tests left to be done...");
+			finish();
+			return;
+		}
 		boolean testPositive = engine.getTestResults(test);
+
+		view.logln(">> I am not sure, Lest's make some tests...");
 		view.logln(">> " + test.getName()+ "...");
 		if(testPositive){
 			view.logln(">> Great, test result is posotive!");

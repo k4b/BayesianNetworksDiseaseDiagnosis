@@ -114,8 +114,9 @@ public class AnswerProcessor {
         for(int i=0;i<hits.length;++i) {
             int docId = hits[i].doc;
             Document d = searcher.doc(docId);
-            
-            results.put(d.get(SYMPTOM), new Boolean(true));
+            String key =  d.get(SYMPTOM);
+            String res = datamodel.getSymptoms().get(key).getNonStemmedName();
+            results.put(res, new Boolean(true));
         }
         
         System.out.println("Found " + hits.length + " symptoms:");

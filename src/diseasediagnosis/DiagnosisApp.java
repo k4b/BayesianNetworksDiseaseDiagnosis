@@ -112,7 +112,7 @@ public class DiagnosisApp extends JFrame {
 				}
 				DataModel data = new DataModel();
 				data.setSymptoms(parser.getSymptoms());
-				data.setSymptomNames( parser.getSymptoms().keySet().toArray(new String[parser.getSymptoms().size()]));
+				data.setSymptomNames( parser.getSymptoms());
 				//                    data.setSymptomNames(parser.getSymptoms());
 				new DiagnosisApp(data, parser.getDiseases(), parser.getSymptoms()).setVisible(true);
 			}

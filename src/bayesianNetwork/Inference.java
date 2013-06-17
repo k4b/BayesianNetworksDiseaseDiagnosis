@@ -145,16 +145,17 @@ public class Inference {
 			Entry<DiseaseTest, DiseaseProbabilityBean> entry = entries.next();
 			double VoI = entry.getValue().getpSgivenD()
 					- entry.getValue().getpSgivenNotD();
-			if (VoI > testVoI) {
+			DiseaseTest test =  (DiseaseTest) entry.getKey();
+			if (VoI > testVoI && !conductedTests.containsKey(bestTest) ) {
 				testVoI = VoI;
-				bestTest = (DiseaseTest) entry.getKey();
+				bestTest =test;
 			}
 		}
 		
-		if(!conductedTests.containsKey(bestTest)){
-			conductedTests.put(bestTest, Boolean.TRUE);
-			return bestTest;
-		}
+//		if(!conductedTests.containsKey(bestTest)){
+//			conductedTests.put(bestTest, Boolean.TRUE);
+//			return bestTest;
+//		}
 	
 		return null;
 	}

@@ -58,11 +58,11 @@ public class Parser {
 	private void parseTerm() throws IOException {
 		String line;
 		Disease disease = new Disease();
-		disease.setDiseaseProbability(RandGenerator.getDiseaseP());
 		boolean someSymptomsAdded = false;
 		while((line = reader.readLine())!=null){
 			if(line.startsWith(NAME)){
 				disease.setName(line.substring(NAME.length()));
+				disease.setDiseaseProbability(RandGenerator.getDiseaseP(disease.getName()));
 			}
 			else if(line.startsWith(DEFINITION_PREFIX)){
 				someSymptomsAdded = parseDefinition(disease, line);
@@ -102,6 +102,7 @@ public class Parser {
 						symptom = new DiseaseSymptom(stemmedName);
 						symptom.setNonStemmedName(name);
 					}
+				
 					DiseaseProbabilityBean probability =new DiseaseProbabilityBean(disease, symptom, 
 							RandGenerator.getPSgivenD(), RandGenerator.getPSgivenNotD());
 
