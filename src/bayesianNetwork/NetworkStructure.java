@@ -191,5 +191,10 @@ public class NetworkStructure {
 		this.net = net;
 	}
 
+	public Integer resolveDiseaseToNode(String name) {
+		return  diseaseNodes.get(name);
+
+	}
+
 	
 }

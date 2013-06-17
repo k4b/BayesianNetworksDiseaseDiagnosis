@@ -71,6 +71,8 @@ public class Inference {
 		networkStructure = new NetworkStructure();
 //		net = networkStructure.CreateNetwork(diseases ,  symptoms);
 		network = networkStructure.CreateNetwork(diseases);
+		this.diseases = diseases; 
+
 		observed = new HashSet<Pair<String, String>>();
 		observedNodes = new HashSet<Pair<Integer, String>>();
 		mostProbableDisease = null;
@@ -185,7 +187,7 @@ public class Inference {
 
 	private void runInference() {
 		network.clearAllEvidence();
-		double maxProbability = 0;
+//		double maxProbability = 0;
 		try {
 			for (Pair<Integer, String> observation : observedNodes) {
 
@@ -193,13 +195,22 @@ public class Inference {
 						observation.getRight());
 			}
 			network.updateBeliefs();
+			
 
-			for (int i = 0; i < diseases.size(); ++i) {
-				network.getNode((diseases.get(i)).getName());
-				double probab = network.getNodeValue(i)[0];
+			Iterator<Entry<String, Disease>> iterator = diseases.entrySet().iterator();
+
+//			for (int i = 0; i < diseases.size(); ++i) {
+			while(iterator.hasNext()){
+				Disease d = iterator.next().getValue();
+				Integer diseaseNodeNumber =  networkStructure.resolveDiseaseToNode(d.getName());
+				if(diseaseNodeNumber == null)
+					continue;
+	//			network.getNode(diseaseNodeNumber);
+	//			network.getNode
+				double probab = network.getNodeValue(diseaseNodeNumber)[0];
 				if (probab > maxProbability) {
 					maxProbability = probab;
-					this.mostProbableDisease = (diseases.get(i)).getName();
+					this.mostProbableDisease = d.getName();
 				}
 			}
 
