@@ -70,21 +70,23 @@ public class ChatBot implements ActionListener {
 			boolean containsConfirmation = checkConfirmation(text);
 			
 			if(state.equals(State.AskedSpecificQuestion) && containsNegation){
-				foundSymptoms = new SymptomsOccurence();
+//				foundSymptoms = new SymptomsOccurence();
+				foundSymptoms.remove(lastAskedSymptom);
 				foundSymptoms.put(lastAskedSymptom, false);
 
 			}else if(state.equals(State.AskedSpecificQuestion) && containsConfirmation){
-				foundSymptoms = new SymptomsOccurence();
+				foundSymptoms.remove(lastAskedSymptom);
 				foundSymptoms.put(lastAskedSymptom, true);
 			}
-				
+			return foundSymptoms;
+
 		} catch (IOException ex) {
 			Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
 		} catch (ParseException ex) {
 			Logger.getLogger(DiagnosisApp.class.getName()).log(Level.SEVERE, null, ex);
-		} finally {
-			return foundSymptoms;
 		}
+		
+		return new SymptomsOccurence(); 
 	}
 
 	private boolean checkConfirmation(String text) {

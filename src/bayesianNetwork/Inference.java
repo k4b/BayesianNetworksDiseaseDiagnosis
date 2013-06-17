@@ -157,7 +157,7 @@ public class Inference {
 //			return bestTest;
 //		}
 	
-		return null;
+		return bestTest;
 	}
 	
 //	private void listAvailableTests()
