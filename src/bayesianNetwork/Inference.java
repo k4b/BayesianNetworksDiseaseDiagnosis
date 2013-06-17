@@ -4,16 +4,19 @@
 package bayesianNetwork;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import chatBot.SymptomsOccurence;
 
 import smile.Network;
 import smile.SMILEException;
 import datastructures.Disease;
 import datastructures.DiseaseClue;
 import datastructures.DiseaseProbabilityBean;
+import datastructures.DiseaseSymptom;
 import datastructures.DiseaseTest;
 
 /**
@@ -26,7 +29,7 @@ public class Inference {
 	 * @param args
 	 */
 
-	private List<Pair<String, String>> observed; // a list of clues observed for
+	private HashSet<Pair<String, String>> observed; // a list of clues observed for
 													// particular case
 	private final String YES = NetworkStructure.YES;
 	private final String NO = NetworkStructure.NO;
@@ -35,29 +38,49 @@ public class Inference {
 	private final String networkFileName = "tutorial_a.xdsl";
 	private String mostProbableDisease;
 	public static enum VoITestType {MostProbableElimination, Simple, Exhaustive};
+	private double maxProbability;
+
+
+//	public static void main(String[] args) {
+//
+//		// for test/presentation purposes
+//		new NetworkStructure();
+//		InfereceWithBayesianNetwork();
+//	}
+//
+//	public Inference() {
+//		loadNetworkFromFile();
+//		observed = new ArrayList<Pair<String, String>>();
+//		mostProbableDisease = null;
+//
+//	}
+//
+//	private void loadNetworkFromFile() {
+//		try {
+//			net = new Network();
+//			net.readFile(networkFileName);
+//		} catch (SMILEException e) {
+//			System.out.println(e.getMessage());
+//		}
+//	}
 	
-
-	public static void main(String[] args) {
-
-		// for test/presentation purposes
-		new NetworkStructure();
-		InfereceWithBayesianNetwork();
-	}
-
-	public Inference() {
-		loadNetworkFromFile();
-		observed = new ArrayList<Pair<String, String>>();
+	public Inference(Map <String, Disease> diseases ,  Map <String, DiseaseSymptom> symptoms) {
+		NetworkStructure networkStructure = new NetworkStructure();
+//		net = networkStructure.CreateNetwork(diseases ,  symptoms);
+		net = networkStructure.CreateNetwork();
+		observed = new HashSet<Pair<String, String>>();
 		mostProbableDisease = null;
-
 	}
-
-	private void loadNetworkFromFile() {
-		try {
-			net = new Network();
-			net.readFile(networkFileName);
-		} catch (SMILEException e) {
-			System.out.println(e.getMessage());
+	
+	public void invokeInference(SymptomsOccurence symptoms){
+		Iterator<Entry<String, Boolean>>  it = symptoms.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<String, Boolean>  pair = it.next();
+			addEvidence(pair.getKey(), pair.getValue());
 		}
+		
+		//TODO run this in new thread??
+		//runInference();
 	}
 
 	public void addEvidence(String clueName, boolean isPositive // TRUE if clue occurs
@@ -67,8 +90,8 @@ public class Inference {
 
 	}
 
-	public String findMostLikelyDisease() {
-		return mostProbableDisease;
+	public Pair<Disease, Double> findMostLikelyDisease() {
+		return new Pair<Disease, Double> (diseases.get(mostProbableDisease), new Double(maxProbability));
 	}
 
 	public DiseaseTest findMostSuitableTest(VoITestType type) {

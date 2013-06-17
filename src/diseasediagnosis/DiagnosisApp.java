@@ -5,6 +5,7 @@
 package diseasediagnosis;
 
 import Ontology.Parser;
+import bayesianNetwork.Inference;
 import chatBot.AnswerProcessor;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -16,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,13 +42,15 @@ public class DiagnosisApp extends JFrame {
 	private DataModel data;
 	private ChatBot chatbot;
 
-	public DiagnosisApp(DataModel data) {
+	public DiagnosisApp(DataModel data, Map <String, Disease> diseases, Map <String, DiseaseSymptom> symptoms) {
 		super();
 		this.data = data;
-		chatbot = new ChatBot(this, data);
+		Inference engine = new Inference(diseases, symptoms);
+		chatbot = new ChatBot(this, data, engine);
+		
 		initComponents();
 		chatbot.invitation();
-		textField.setText(SHORT_ANSWER);
+		//textField.setText(SHORT_ANSWER);
 		textField.requestFocus();
 	}
 
@@ -110,7 +114,7 @@ public class DiagnosisApp extends JFrame {
 				data.setSymptoms(parser.getSymptoms());
 				data.setSymptomNames( parser.getSymptoms().keySet().toArray(new String[parser.getSymptoms().size()]));
 				//                    data.setSymptomNames(parser.getSymptoms());
-				new DiagnosisApp(data).setVisible(true);
+				new DiagnosisApp(data, parser.getDiseases(), parser.getSymptoms()).setVisible(true);
 			}
 		});
 	}
