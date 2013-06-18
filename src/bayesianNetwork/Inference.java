@@ -345,8 +345,10 @@ public class Inference {
 		Entry<Disease, DiseaseProbabilityBean> entry = test.getProbabilities().entrySet().iterator().next();
 		Disease d = entry.getKey();
 		DiseaseProbabilityBean p = entry.getValue();
-		totalP = d.getDiseaseProbability() * p.getpSgivenD() + (1-d.getDiseaseProbability())*p.getpSgivenNotD();	
-		if(Math.random() > totalP)
+//		totalP = d.getDiseaseProbability() * p.getpSgivenD() + (1-d.getDiseaseProbability())*p.getpSgivenNotD();	
+		totalP = maxProbability * p.getpSgivenD() + (1-maxProbability)*p.getpSgivenNotD();
+		double rand = Math.random();
+		if(rand > totalP)
 			return false;
 		
 		return true;

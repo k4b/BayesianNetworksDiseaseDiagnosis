@@ -4,7 +4,7 @@ import datastructures.DiseaseTest;
 
 public class RandGenerator {
 	private static double DISEASE_MIN_P = 0.1; //divided by disease name lenght ^2
-	private static double DISEASE_MAX_P = 0.2;//divided by disease name lenght ^ 2
+	private static double DISEASE_MAX_P = 0.5;//divided by disease name lenght ^ 2
 	
 	private static double SYNDROM_GIVEN_D_MIN_P = 0.7;
 	private static double SYNDROM_GIVEN_D_MAX_P = 0.99;

@@ -42,7 +42,7 @@ public class ChatBot implements ActionListener {
 	private Disease lastDisease;
 	private double probability;
 
-	private final double PROBABILITY_TRESHOLD = 0.99; 
+	private final double PROBABILITY_TRESHOLD = 0.99999; 
 	private Inference engine;
 	private String lastAskedSymptom;
 	private boolean testsDone = false;
@@ -209,7 +209,7 @@ public class ChatBot implements ActionListener {
 	}
 
 	private void orderTests() {
-		view.logln(">> I am not sure, Lest's make some tests...");
+//		view.logln(">> I am not sure, Lest's make some tests...");
 		DiseaseTest test = engine.findMostSuitableTest(Inference.VoITestType.MostProbableElimination, lastDisease);
 		if(test == null){
 			testsDone = true;
