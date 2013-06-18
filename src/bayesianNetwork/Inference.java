@@ -187,7 +187,7 @@ public class Inference {
 
 	private void runInference() {
 		network.clearAllEvidence();
-//		double maxProbability = 0;
+		maxProbability = 0;
 		try {
 			for (Pair<Integer, String> observation : observedNodes) {
 

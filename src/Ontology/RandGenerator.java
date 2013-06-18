@@ -3,26 +3,26 @@ package Ontology;
 import datastructures.DiseaseTest;
 
 public class RandGenerator {
-	private static double DISEASE_MIN_P = 0.05; //divided by disease name lenght
-	private static double DISEASE_MAX_P = 0.2;//divided by disease name lenght
+	private static double DISEASE_MIN_P = 0.1; //divided by disease name lenght ^2
+	private static double DISEASE_MAX_P = 0.2;//divided by disease name lenght ^ 2
 	
-	private static double SYNDROM_GIVEN_D_MIN_P = 0.8;
+	private static double SYNDROM_GIVEN_D_MIN_P = 0.7;
 	private static double SYNDROM_GIVEN_D_MAX_P = 0.99;
 
 	
 	private static double SYNDROM_GIVEN_NOT_D_MIN_P = 0.01;
-	private static double SYNDROM_GIVEN_NOT_D_MAX_P = 0.5;
+	private static double SYNDROM_GIVEN_NOT_D_MAX_P = 0.3;
 	
 	private static double TEST_POSITIVE_GIVEN_D_MIN_P = 0.9;
-	private static double TEST_POSITIVE_GIVEN_D_MAX_P = 0.999;
+	private static double TEST_POSITIVE_GIVEN_D_MAX_P = 0.9999;
 
 	
 	private static double TEST_POSITIVE_GIVEN_NOT_D_MIN_P = 0.01;
-	private static double TEST_POSITIVE_GIVEN_NOT_D_MAX_P = 0.2;
+	private static double TEST_POSITIVE_GIVEN_NOT_D_MAX_P = 0.1;
 	
 
 	public static double getDiseaseP(String string){
-		return (DISEASE_MIN_P + Math.random()* (DISEASE_MAX_P-DISEASE_MIN_P)) / (string.length());
+		return (DISEASE_MIN_P + Math.random()* (DISEASE_MAX_P-DISEASE_MIN_P)) / (string.length()*string.length());
 	}
 	
 	public static double getPSgivenD(){

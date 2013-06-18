@@ -31,7 +31,7 @@ public class Parser {
 
 	private static final int SYMPTOMS_INITIAL_CAPACITY = 1000;
 
-	private static final int NUMBER_OF_TESTS = 10;
+	private static final int NUMBER_OF_TESTS = 5;
 	
 	private AnswerProcessor wordProcessor  = new AnswerProcessor();
 	
