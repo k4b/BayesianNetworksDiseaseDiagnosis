@@ -159,7 +159,7 @@ public class ChatBot implements ActionListener {
 		if(isFirstCall == false && disease != null && disease.getName().equals(lastDisease.getName())) {
 			word = "still ";
 		}
-		view.logln(">> It " + word + "looks that you have " + disease.getName() + ". But tell me how about " + symptomsToAsk.get(0) + "?");
+		view.logln(">> It " + word + "looks that you have " + disease.getName() + ". But tell me, do you have " + symptomsToAsk.get(0) + "?");
 		state = State.AskedSpecificQuestion;
 		lastAskedSymptom = symptomsToAsk.get(0);
 	}
@@ -196,14 +196,16 @@ public class ChatBot implements ActionListener {
 	}
 
 	private void updateOccurances(SymptomsOccurence symptomsOccurence) {
-		
-		Iterator<Entry<String, Boolean>> iterator = symptomsOccurence.entrySet().iterator();
-		while (iterator.hasNext()) {
-			totalSymptomsOccurence.remove(iterator.next().getKey());			
+		if(totalSymptomsOccurence!= symptomsOccurence){
+			Iterator<Entry<String, Boolean>> iterator = symptomsOccurence.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Entry<String, Boolean> entry = iterator.next();
+				String key = entry.getKey();
+				totalSymptomsOccurence.remove(key);			
+			}
+	
+			totalSymptomsOccurence.putAll(symptomsOccurence);
 		}
-
-		totalSymptomsOccurence.putAll(symptomsOccurence);
-		
 	}
 
 	private void orderTests() {
@@ -220,7 +222,7 @@ public class ChatBot implements ActionListener {
 		view.logln(">> I am not sure, Lest's make some tests...");
 		view.logln(">> " + test.getName()+ "...");
 		if(testPositive){
-			view.logln(">> Great, test result is posotive!");
+			view.logln(">> Great, test result is positive!");
 		}else{
 			view.logln(">> Great, test result is negative!");
 		}

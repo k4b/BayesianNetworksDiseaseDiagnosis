@@ -96,8 +96,7 @@ public class Inference {
 	) {
 		this.observed.add(new Pair<String, String>(clueName, isPositive ? YES
 				: NO));
-		ArrayList<Integer> nodeIDs = networkStructure
-				.resolveClueToNode(clueName);
+		ArrayList<Integer> nodeIDs = networkStructure.resolveClueToNode(clueName);
 		if (null != nodeIDs) {
 			if (!nodeIDs.isEmpty()) {
 				for (Integer position : nodeIDs) {
@@ -109,7 +108,7 @@ public class Inference {
 						.println("addEvidence error: clue is not added to bayesian network");
 			}
 		} else {
-			System.out.println("addEvidence error: no clue on the list");
+			System.out.println("addEvidence error: no clue on the list: " + clueName);
 		}
 
 	}
@@ -146,7 +145,7 @@ public class Inference {
 			double VoI = entry.getValue().getpSgivenD()
 					- entry.getValue().getpSgivenNotD();
 			DiseaseTest test =  (DiseaseTest) entry.getKey();
-			if (VoI > testVoI && !conductedTests.containsKey(bestTest) ) {
+			if (VoI > testVoI && !conductedTests.containsKey(test) ) {
 				testVoI = VoI;
 				bestTest =test;
 			}
@@ -156,7 +155,7 @@ public class Inference {
 //			conductedTests.put(bestTest, Boolean.TRUE);
 //			return bestTest;
 //		}
-	
+		conductedTests.put(bestTest, true);
 		return bestTest;
 	}
 	

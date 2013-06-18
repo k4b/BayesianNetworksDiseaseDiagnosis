@@ -109,7 +109,7 @@ public class NetworkStructure {
 						.getTests();
 				Iterator<Entry<DiseaseTest, DiseaseProbabilityBean>> entries2 = tests.entrySet().iterator();
 
-				while (entries.hasNext()) {
+				while (entries2.hasNext()) {
 					Entry<DiseaseTest, DiseaseProbabilityBean> entry = entries2
 							.next();
 
