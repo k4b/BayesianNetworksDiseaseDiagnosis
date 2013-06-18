@@ -42,7 +42,7 @@ public class ChatBot implements ActionListener {
 	private Disease lastDisease;
 	private double probability;
 
-	private final double PROBABILITY_TRESHOLD = 0.99999; 
+	private final double PROBABILITY_TRESHOLD = 0.99; 
 	private Inference engine;
 	private String lastAskedSymptom;
 	private boolean testsDone = false;
